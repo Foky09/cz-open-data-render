@@ -4,132 +4,134 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>DeskaRadar — JMK</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #0f1419; --panel: #1a2332; --border: #2d3a4d;
-      --text: #e7ecf3; --muted: #8b9bb4; --accent: #3d9cf0;
-      --ok: #3ecf8e; --fail: #f07178; --high: #ffb454; --med: #7aa2f7;
-      --chip: #243044;
+      --paper:#F7F4EF; --ink:#1C1917; --muted:#78716C; --line:#E7E0D6;
+      --accent:#E07A5F; --accent-dark:#C45D42; --card:#FFFCFA;
+      --ok:#15803D; --fail:#B91C1C; --high:#B45309; --med:#1D4ED8;
+      --chip:#F3EDE4; --shadow:0 8px 24px rgba(28,25,23,.07);
     }
-    * { box-sizing: border-box; }
+    * { box-sizing:border-box; }
     body {
-      margin: 0; font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
-      background: var(--bg); color: var(--text); line-height: 1.45; min-height: 100vh;
+      margin:0; font-family:"Nunito Sans",system-ui,sans-serif;
+      background:var(--paper); color:var(--ink); line-height:1.45; min-height:100vh;
+      background-image:radial-gradient(circle, rgba(224,122,95,.18) 1px, transparent 1.2px);
+      background-size:20px 20px;
     }
+    h1,h2,h3 { font-family:"Fraunces",Georgia,serif; letter-spacing:-.02em; }
     header {
-      padding: .85rem 1.25rem; border-bottom: 1px solid var(--border);
-      background: linear-gradient(180deg, #152033 0%, var(--bg) 100%);
-      display: flex; flex-wrap: wrap; gap: .65rem 1.25rem; align-items: center; justify-content: space-between;
+      padding:.9rem 1.25rem; border-bottom:2px solid var(--ink);
+      background:var(--card); display:flex; flex-wrap:wrap; gap:.65rem 1.25rem;
+      align-items:center; justify-content:space-between;
     }
-    header h1 { margin: 0; font-size: 1.15rem; font-weight: 650; letter-spacing: -.02em; }
-    header h1 span { color: var(--accent); }
-    .meta { color: var(--muted); font-size: .82rem; }
-    .fresh-bar {
-      display: flex; flex-wrap: wrap; gap: .45rem .85rem; align-items: center;
-      margin-top: .35rem; font-size: .8rem;
-    }
+    header h1 { margin:0; font-size:1.2rem; font-weight:700; }
+    header h1 span { color:var(--accent); }
+    .meta { color:var(--muted); font-size:.82rem; }
+    .fresh-bar { display:flex; flex-wrap:wrap; gap:.45rem .85rem; align-items:center; margin-top:.35rem; font-size:.8rem; }
     .fresh-bar .stamp {
-      font-weight: 600; color: var(--text);
-      background: var(--panel); border: 1px solid var(--border);
-      padding: .2rem .55rem; border-radius: 6px; font-variant-numeric: tabular-nums;
+      font-weight:700; color:var(--ink); background:#FFF5F0; border:1.5px solid var(--accent);
+      padding:.2rem .55rem; border-radius:8px; font-variant-numeric:tabular-nums;
     }
-    .fresh-bar .stamp.stale { border-color: #5a4030; color: var(--high); }
-    .fresh-bar .hint { color: var(--muted); }
-    nav { display: flex; flex-wrap: wrap; gap: .35rem; }
+    .fresh-bar .stamp.stale { border-color:#F59E0B; color:var(--high); background:#FFFBEB; }
+    .fresh-bar .hint { color:var(--muted); }
+    nav { display:flex; flex-wrap:wrap; gap:.35rem; }
     nav button {
-      font: inherit; font-size: .85rem; padding: .4rem .75rem; border-radius: 8px;
-      border: 1px solid transparent; background: transparent; color: var(--muted); cursor: pointer;
+      font:inherit; font-size:.85rem; padding:.45rem .8rem; border-radius:999px;
+      border:1.5px solid transparent; background:transparent; color:var(--muted); cursor:pointer; font-weight:600;
     }
-    nav button.active { background: var(--panel); border-color: var(--border); color: var(--text); }
-    nav button:hover { color: var(--text); }
-    .userbar { display: flex; gap: .6rem; align-items: center; }
-    main { max-width: 1100px; margin: 0 auto; padding: 1.1rem 1.25rem 3rem; }
-    .panel { display: none; }
-    .panel.active { display: block; }
+    nav button.active { background:var(--ink); border-color:var(--ink); color:#fff; }
+    nav button:hover { color:var(--ink); }
+    .userbar { display:flex; gap:.55rem; align-items:center; flex-wrap:wrap; }
+    main { max-width:1100px; margin:0 auto; padding:1.1rem 1.25rem 3rem; }
+    .panel { display:none; }
+    .panel.active { display:block; }
     section, .card {
-      background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
-      padding: 1rem 1.1rem; margin-bottom: 1.1rem;
+      background:var(--card); border:1.5px solid var(--line); border-radius:18px;
+      padding:1.1rem 1.2rem; margin-bottom:1.1rem; box-shadow:var(--shadow);
     }
-    h2 { margin: 0 0 .75rem; font-size: 1rem; font-weight: 600; display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
+    h2 { margin:0 0 .75rem; font-size:1.15rem; font-weight:700; display:flex; gap:.5rem; align-items:center; flex-wrap:wrap; }
     .badge {
-      display: inline-block; font-size: .68rem; font-weight: 600; padding: .1rem .45rem;
-      border-radius: 999px; background: #243044; color: var(--muted);
-      text-transform: uppercase; letter-spacing: .04em; vertical-align: middle;
+      display:inline-block; font-size:.68rem; font-weight:800; padding:.15rem .5rem;
+      border-radius:999px; background:var(--chip); color:var(--muted);
+      text-transform:uppercase; letter-spacing:.04em; vertical-align:middle; border:1px solid var(--line);
+      font-family:"Nunito Sans",sans-serif;
     }
-    .badge.high { background: #3a2e1a; color: var(--high); }
-    .badge.medium { background: #1a2740; color: var(--med); }
-    .badge.ok { background: #163528; color: var(--ok); }
-    .badge.fail { background: #3a1e22; color: var(--fail); }
+    .badge.high { background:#FEF3C7; color:var(--high); border-color:#F59E0B; }
+    .badge.medium { background:#DBEAFE; color:var(--med); border-color:#93C5FD; }
+    .badge.ok { background:#DCFCE7; color:var(--ok); border-color:#86EFAC; }
+    .badge.fail { background:#FEE2E2; color:var(--fail); border-color:#FCA5A5; }
     .chip {
-      display: inline-block; font-size: .72rem; font-weight: 500; padding: .12rem .5rem;
-      border-radius: 6px; background: var(--chip); color: var(--text);
-      border: 1px solid var(--border); white-space: nowrap;
+      display:inline-block; font-size:.72rem; font-weight:700; padding:.15rem .55rem;
+      border-radius:8px; background:var(--chip); color:var(--ink);
+      border:1px solid var(--line); white-space:nowrap;
     }
-    .filters { display: flex; flex-wrap: wrap; gap: .55rem; margin-bottom: .9rem; align-items: end; }
-    label.field { display: flex; flex-direction: column; gap: .2rem; font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; }
-    select, input[type="date"], input[type="email"], input[type="text"], button.btn {
-      font: inherit; font-size: .88rem; padding: .4rem .6rem; border-radius: 6px;
-      border: 1px solid var(--border); background: #121a26; color: var(--text);
+    .filters { display:flex; flex-wrap:wrap; gap:.55rem; margin-bottom:.9rem; align-items:end; }
+    label.field { display:flex; flex-direction:column; gap:.2rem; font-size:.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:.03em; font-weight:700; }
+    select, input[type="date"], input[type="email"], input[type="text"], input[type="search"], button.btn {
+      font:inherit; font-size:.88rem; padding:.45rem .65rem; border-radius:12px;
+      border:1.5px solid var(--line); background:#fff; color:var(--ink);
     }
     button.btn {
-      background: var(--accent); border-color: transparent; color: #061018; font-weight: 600; cursor: pointer;
-      text-transform: none; letter-spacing: 0;
+      background:var(--accent); border:2px solid var(--ink); color:#fff; font-weight:700; cursor:pointer;
+      box-shadow:2px 2px 0 var(--ink); border-radius:999px; text-transform:none; letter-spacing:0;
     }
-    button.btn:hover { filter: brightness(1.08); }
-    button.btn:disabled { opacity: .55; cursor: wait; }
-    button.btn.secondary { background: transparent; border-color: var(--border); color: var(--text); }
-    a { color: var(--accent); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    .muted { color: var(--muted); font-size: .8rem; }
+    button.btn:hover { filter:brightness(1.05); }
+    button.btn:disabled { opacity:.55; cursor:wait; }
+    button.btn.secondary { background:#fff; color:var(--ink); }
+    a { color:var(--accent-dark); text-decoration:none; font-weight:600; }
+    a:hover { text-decoration:underline; }
+    .muted { color:var(--muted); font-size:.8rem; }
     .empty-state {
-      text-align: center; padding: 1.75rem 1rem; color: var(--muted);
-      border: 1px dashed var(--border); border-radius: 10px; background: #121a26;
+      text-align:center; padding:1.75rem 1rem; color:var(--muted);
+      border:2px dashed var(--line); border-radius:16px; background:#FAF7F2;
     }
-    .empty-state strong { display: block; color: var(--text); font-size: .95rem; margin-bottom: .35rem; font-style: normal; }
-    .empty-state p { margin: 0; font-size: .85rem; max-width: 36rem; margin-inline: auto; }
-    .stats { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: .75rem; font-size: .85rem; color: var(--muted); }
-    .stats strong { color: var(--text); }
-    /* Tighter lead cards */
-    .lead-list { display: flex; flex-direction: column; gap: .45rem; }
+    .empty-state strong { display:block; color:var(--ink); font-size:1rem; margin-bottom:.35rem; font-family:"Fraunces",serif; }
+    .empty-state p { margin:0; font-size:.85rem; max-width:36rem; margin-inline:auto; }
+    .stats { display:flex; flex-wrap:wrap; gap:1rem; margin-bottom:.75rem; font-size:.85rem; color:var(--muted); }
+    .stats strong { color:var(--ink); }
+    .lead-list { display:flex; flex-direction:column; gap:.55rem; }
     .lead-card {
-      display: grid; grid-template-columns: auto 1fr auto; gap: .55rem .75rem;
-      align-items: start; padding: .55rem .7rem;
-      border: 1px solid var(--border); border-radius: 8px; background: #121a26;
+      display:grid; grid-template-columns:auto 1fr auto; gap:.55rem .75rem;
+      align-items:start; padding:.7rem .85rem;
+      border:1.5px solid var(--line); border-radius:14px; background:#fff;
     }
-    .lead-card .lead-main { min-width: 0; }
-    .lead-card .title { font-weight: 550; font-size: .9rem; margin: 0 0 .2rem; }
-    .lead-card .meta-row { display: flex; flex-wrap: wrap; gap: .35rem .55rem; align-items: center; }
-    .lead-card .side { text-align: right; font-size: .78rem; color: var(--muted); white-space: nowrap; }
-    @media (max-width: 640px) {
-      .lead-card { grid-template-columns: auto 1fr; }
-      .lead-card .side { grid-column: 2; text-align: left; }
+    .lead-card .lead-main { min-width:0; }
+    .lead-card .title { font-weight:700; font-size:.95rem; margin:0 0 .25rem; font-family:"Fraunces",serif; }
+    .lead-card .meta-row { display:flex; flex-wrap:wrap; gap:.35rem .55rem; align-items:center; }
+    .lead-card .side { text-align:right; font-size:.78rem; color:var(--muted); white-space:nowrap; }
+    @media (max-width:640px) {
+      .lead-card { grid-template-columns:auto 1fr; }
+      .lead-card .side { grid-column:2; text-align:left; }
     }
-    .digest-group { margin-bottom: 1.1rem; }
+    .digest-group { margin-bottom:1.1rem; }
     .digest-group h3 {
-      margin: 0 0 .5rem; font-size: .95rem; border-bottom: 1px solid var(--border); padding-bottom: .35rem;
-      display: flex; gap: .5rem; align-items: center; flex-wrap: wrap;
+      margin:0 0 .5rem; font-size:1rem; border-bottom:1.5px solid var(--line); padding-bottom:.35rem;
+      display:flex; gap:.5rem; align-items:center; flex-wrap:wrap;
     }
     .digest-item {
-      display: grid; grid-template-columns: auto 1fr; gap: .45rem .65rem;
-      padding: .45rem 0; border-bottom: 1px solid rgba(45,58,77,.6); align-items: start;
+      display:grid; grid-template-columns:auto 1fr; gap:.45rem .65rem;
+      padding:.5rem 0; border-bottom:1px solid var(--line); align-items:start;
     }
-    .digest-item:last-child { border-bottom: none; }
-    .prefs-grid { display: grid; gap: .85rem; max-width: 520px; }
-    .check { display: flex; gap: .5rem; align-items: center; font-size: .9rem; color: var(--text); text-transform: none; letter-spacing: 0; }
-    .check input { width: auto; }
-    .muni-checks { display: flex; flex-wrap: wrap; gap: .4rem .85rem; max-height: 160px; overflow: auto; padding: .4rem 0; }
-    .toast { color: var(--ok); font-size: .85rem; min-height: 1.2em; }
-    footer { color: var(--muted); font-size: .75rem; margin-top: .5rem; }
-    code { font-size: .8em; background: #121a26; padding: .1em .35em; border-radius: 4px; }
+    .digest-item:last-child { border-bottom:none; }
+    .prefs-grid { display:grid; gap:.85rem; max-width:520px; }
+    .check { display:flex; gap:.5rem; align-items:center; font-size:.9rem; color:var(--ink); text-transform:none; letter-spacing:0; font-weight:600; }
+    .check input { width:auto; }
+    .muni-checks { display:flex; flex-wrap:wrap; gap:.4rem .85rem; max-height:160px; overflow:auto; padding:.4rem 0; }
+    .toast { color:var(--ok); font-size:.85rem; min-height:1.2em; }
+    footer { color:var(--muted); font-size:.75rem; margin-top:.5rem; }
+    code { font-size:.8em; background:var(--chip); padding:.1em .35em; border-radius:4px; }
     .alert-item {
-      display: grid; grid-template-columns: auto 1fr; gap: .45rem .65rem;
-      padding: .55rem 0; border-bottom: 1px solid var(--border); align-items: start;
+      display:grid; grid-template-columns:auto 1fr; gap:.45rem .65rem;
+      padding:.55rem 0; border-bottom:1px solid var(--line); align-items:start;
     }
-    .alert-item:last-child { border-bottom: none; }
-    table { width: 100%; border-collapse: collapse; font-size: .875rem; }
-    th, td { text-align: left; padding: .5rem .4rem; border-bottom: 1px solid var(--border); vertical-align: top; }
-    th { color: var(--muted); font-weight: 500; font-size: .7rem; text-transform: uppercase; letter-spacing: .04em; }
-    tr:hover td { background: rgba(61,156,240,.05); }
+    .alert-item:last-child { border-bottom:none; }
+    table { width:100%; border-collapse:collapse; font-size:.875rem; }
+    th, td { text-align:left; padding:.5rem .4rem; border-bottom:1px solid var(--line); vertical-align:top; }
+    th { color:var(--muted); font-weight:700; font-size:.7rem; text-transform:uppercase; letter-spacing:.04em; }
+    tr:hover td { background:rgba(224,122,95,.06); }
   </style>
 </head>
 <body>
@@ -155,7 +157,6 @@
   </header>
 
   <main>
-    <!-- LEADS -->
     <div class="panel active" id="tab-leads">
       <section>
         <h2>Leady <span class="badge" id="leadCount">—</span></h2>
@@ -170,8 +171,11 @@
           <label class="field">Obec / kraj
             <select id="fMuni"><option value="">vše</option></select>
           </label>
-          <label class="field">Kategorie
+          <label class="field">Typ / kategorie
             <select id="fCat"><option value="">vše</option></select>
+          </label>
+          <label class="field">Hledat
+            <input type="search" id="fQuery" placeholder="titulek, obec…" />
           </label>
           <label class="field">Od
             <input type="date" id="fFrom" />
@@ -180,17 +184,17 @@
             <input type="date" id="fTo" />
           </label>
           <button type="button" class="btn" id="btnApply">Filtrovat</button>
+          <button type="button" class="btn secondary" id="btnCsv">Export CSV</button>
         </div>
         <div class="stats" id="leadStats"></div>
         <div id="leadsBody" class="lead-list"></div>
         <div id="leadsEmpty" class="empty-state" hidden>
           <strong>Žádné leady</strong>
-          <p>Pro zvolené filtry nemáme žádné stavební / záměr leady. Zkuste rozšířit jistota, obec nebo datum — nebo počkejte na další obnovení cache.</p>
+          <p>Pro zvolené filtry nemáme žádné stavební / záměr leady. Zkuste rozšířit jistotu, obec, query nebo datum — nebo počkejte na další obnovení cache.</p>
         </div>
       </section>
     </div>
 
-    <!-- DIGEST -->
     <div class="panel" id="tab-digest">
       <section>
         <h2>Denní digest <span class="badge">stavební / záměr</span></h2>
@@ -218,7 +222,6 @@
       </section>
     </div>
 
-    <!-- ALERTS + PREFS -->
     <div class="panel" id="tab-alerts">
       <section>
         <h2>Alerty <span class="badge high">nastavení · 24 h</span></h2>
@@ -247,7 +250,6 @@
       </section>
     </div>
 
-    <!-- HEALTH -->
     <div class="panel" id="tab-health">
       <section>
         <h2>Stav feedů</h2>
@@ -269,8 +271,8 @@
 
     <footer id="appFooter">
       Zdroje: OFN JSON-LD (NKOD). Brno CC BY 4.0 (MMB). Cache 20 min. Bez eDesky scrape.
-      Soft auto-refresh UI: každých <span id="softRefreshLabel">3</span> min (z cache, bez hammerování feedů).
-      API: <code>/api/leads</code> · <code>/api/digest</code> · <code>/api/alerts</code> · <code>/api/alert-prefs</code> · <code>/api/providers</code>
+      Soft auto-refresh UI: každých <span id="softRefreshLabel">3</span> min.
+      API: <code>/api/leads</code> · <code>/api/leads.csv</code> · <code>/api/digest</code>
     </footer>
   </main>
 
@@ -306,6 +308,16 @@
       return `<div class="empty-state"><strong>${escapeHtml(title)}</strong><p>${escapeHtml(body)}</p></div>`;
     }
 
+    function leadsQueryParams() {
+      const params = new URLSearchParams({ confidence: $("fConfidence").value });
+      if ($("fMuni").value) params.set("municipality", $("fMuni").value);
+      if ($("fCat").value) params.set("category", $("fCat").value);
+      if ($("fFrom").value) params.set("date_from", $("fFrom").value);
+      if ($("fTo").value) params.set("date_to", $("fTo").value);
+      if ($("fQuery").value.trim()) params.set("q", $("fQuery").value.trim());
+      return params;
+    }
+
     function updateFreshBar(meta) {
       const stamp = $("cacheStamp");
       const hint = $("cacheHint");
@@ -323,7 +335,7 @@
       const rewarmMin = Math.round((meta.rewarm_interval_s || 300) / 60);
       hint.textContent =
         `stáří ${age}s / TTL ${ttl}s · ${meta.fresh ? "čerstvé" : "zastaralé"}` +
-        ` · UI soft-refresh ${softMin} min · server re-warm každých ${rewarmMin} min (jen při stale cache)`;
+        ` · UI soft-refresh ${softMin} min · server re-warm každých ${rewarmMin} min`;
       if (meta.ui_soft_refresh_s) {
         softRefreshMs = meta.ui_soft_refresh_s * 1000;
         $("softRefreshLabel").textContent = String(softMin);
@@ -339,7 +351,6 @@
       return res;
     }
 
-    // Tabs
     document.querySelectorAll("#nav button").forEach(btn => {
       btn.addEventListener("click", () => {
         document.querySelectorAll("#nav button").forEach(b => b.classList.remove("active"));
@@ -354,13 +365,18 @@
 
     $("btnLogout").addEventListener("click", async () => {
       await api("/api/logout", { method: "POST" });
-      location.href = "/login";
+      location.href = "/";
     });
 
     $("btnApply").addEventListener("click", () => loadLeads());
     $("fConfidence").addEventListener("change", () => loadLeads());
+    $("fQuery").addEventListener("keydown", (e) => { if (e.key === "Enter") loadLeads(); });
     $("btnDigest").addEventListener("click", () => loadDigest());
     $("btnSavePrefs").addEventListener("click", () => savePrefs());
+    $("btnCsv").addEventListener("click", () => {
+      const params = leadsQueryParams();
+      window.location.href = "/api/leads.csv?" + params.toString();
+    });
     $("btnRefresh").addEventListener("click", async () => {
       $("btnRefresh").disabled = true;
       $("cacheStamp").textContent = "Obnovuji feedy (sekvenčně)…";
@@ -411,12 +427,7 @@
     }
 
     async function loadLeads() {
-      const params = new URLSearchParams({ confidence: $("fConfidence").value });
-      if ($("fMuni").value) params.set("municipality", $("fMuni").value);
-      if ($("fCat").value) params.set("category", $("fCat").value);
-      if ($("fFrom").value) params.set("date_from", $("fFrom").value);
-      if ($("fTo").value) params.set("date_to", $("fTo").value);
-
+      const params = leadsQueryParams();
       const res = await api("/api/leads?" + params);
       const leads = await res.json();
 
@@ -577,7 +588,6 @@
     function scheduleSoftRefresh() {
       if (softTimer) clearInterval(softTimer);
       softTimer = setInterval(() => {
-        // Soft: hits /api/leads which serves cache — no force refresh of feeds.
         const active = document.querySelector("#nav button.active")?.dataset?.tab;
         if (active === "leads" || !active) loadLeads().catch(() => {});
         else if (active === "digest") loadDigest().catch(() => {});

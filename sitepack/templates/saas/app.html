@@ -1,10 +1,16 @@
 {% extends "saas/base.html" %}
 {% block title %}Rešerše — SitePack Pro{% endblock %}
 {% block content %}
+<ul class="progress" aria-label="Průběh rešerše">
+  <li class="current"><span>Krok 1</span>Identita parcely</li>
+  <li><span>Krok 2</span>Vrstvy rizik</li>
+  <li><span>Krok 3</span>PDF / HTML report</li>
+</ul>
+
 <h1 style="margin-top:0">Nová rešerše parcely</h1>
 <p style="color:var(--muted);margin-top:0">Zadejte RÚIAN Id <em>nebo</em> k.ú. + parcelní číslo. Prázdný formulář / demo = UKÁZKA (FALLBACK).</p>
 
-{% if error %}<div class="error">{{ error }}</div>{% endif %}
+{% if error %}<div class="error" role="alert">{{ error }}</div>{% endif %}
 
 <div class="warn">
   <strong>⚠ Bez dat o vlastnictví (KN)</strong>
@@ -12,7 +18,7 @@
 </div>
 
 <div class="box">
-  <form method="post" action="/generate">
+  <form method="post" action="/generate" id="pack-form">
     <label for="ruian_id">RÚIAN Id (preferováno)</label>
     <input id="ruian_id" name="ruian_id" type="text" placeholder="např. {{ demo_ruian }}" value=""/>
 
@@ -32,8 +38,9 @@
     </label>
 
     <p style="margin-top:18px">
-      <button class="btn btn-lg" type="submit">Vygenerovat pack</button>
+      <button class="btn btn-lg" type="submit" id="submit-btn">Vygenerovat pack</button>
     </p>
+    <p class="hint" id="busy-hint" hidden>Generuji pack — chvilku strpení, načítám vrstvy…</p>
     <p class="hint">
       Demo: RÚIAN <code>{{ demo_ruian }}</code> · {{ demo_ku }} · {{ demo_parcel }}
       {% if user %}· přihlášen: {{ user.email }}{% else %}· <a href="/login">přihlášení</a> (stub){% endif %}
@@ -53,4 +60,12 @@
   <strong>ℹ Zoning (light)</strong>
   Nenahrazuje územní rozhodnutí ani závazné stanovisko.
 </div>
+<script>
+  document.getElementById("pack-form").addEventListener("submit", function () {
+    var btn = document.getElementById("submit-btn");
+    btn.disabled = true;
+    btn.textContent = "Generuji…";
+    document.getElementById("busy-hint").hidden = false;
+  });
+</script>
 {% endblock %}

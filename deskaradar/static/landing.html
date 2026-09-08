@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DeskaRadar — stavební leady z úředních desek</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --paper: #F7F4EF; --ink: #1C1917; --muted: #78716C; --line: #E7E0D6;
+      --accent: #E07A5F; --accent-dark: #C45D42; --card: #FFFCFA;
+      --shadow: 0 8px 28px rgba(28,25,23,.08);
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:"Nunito Sans",system-ui,sans-serif; background:var(--paper); color:var(--ink); line-height:1.55; }
+    h1,h2,h3 { font-family:"Fraunces",Georgia,serif; letter-spacing:-.02em; line-height:1.2; }
+    a { color:var(--accent-dark); }
+    .doodle-dots {
+      background-image: radial-gradient(circle, rgba(224,122,95,.35) 1.2px, transparent 1.3px);
+      background-size: 18px 18px;
+    }
+    .nav {
+      display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap;
+      padding:1rem 1.5rem; max-width:1100px; margin:0 auto;
+    }
+    .brand { font-family:"Fraunces",serif; font-weight:700; font-size:1.25rem; text-decoration:none; color:var(--ink); }
+    .brand span { color:var(--accent); }
+    .nav-links { display:flex; gap:.75rem; align-items:center; flex-wrap:wrap; }
+    .btn {
+      display:inline-flex; align-items:center; justify-content:center; gap:.4rem;
+      padding:.7rem 1.15rem; border-radius:999px; border:2px solid var(--ink);
+      background:var(--accent); color:#fff; font-weight:700; text-decoration:none;
+      box-shadow: 3px 3px 0 var(--ink); transition: transform .12s ease;
+      font-family:inherit; cursor:pointer; font-size:.95rem;
+    }
+    .btn:hover { transform: translate(-1px,-1px); box-shadow:4px 4px 0 var(--ink); }
+    .btn-ghost { background:transparent; color:var(--ink); box-shadow:none; }
+    .btn-ghost:hover { background:#fff; box-shadow:3px 3px 0 var(--ink); }
+    .wrap { max-width:1100px; margin:0 auto; padding:0 1.5rem 4rem; }
+    .hero {
+      position:relative; margin:1rem 0 2.5rem; padding:2.5rem 2rem;
+      background:var(--card); border:2px solid var(--ink); border-radius:28px;
+      box-shadow:var(--shadow); overflow:hidden;
+    }
+    .hero::after {
+      content:""; position:absolute; right:-40px; top:-40px; width:180px; height:180px;
+      border:3px dashed rgba(224,122,95,.45); border-radius:50%;
+    }
+    .stamp {
+      display:inline-block; font-size:.72rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase;
+      border:2px solid var(--accent); color:var(--accent-dark); padding:.25rem .55rem; border-radius:6px;
+      transform:rotate(-3deg); margin-bottom:1rem;
+    }
+    .hero h1 { font-size:clamp(1.8rem,4vw,2.75rem); margin:0 0 .75rem; max-width:16ch; }
+    .hero p.lead { font-size:1.1rem; color:var(--muted); max-width:42rem; margin:0 0 1.5rem; }
+    .hero-actions { display:flex; gap:.75rem; flex-wrap:wrap; }
+    .section { margin:3rem 0; }
+    .section h2 { font-size:1.65rem; margin:0 0 1rem; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem; }
+    .card {
+      background:var(--card); border:1.5px solid var(--line); border-radius:20px; padding:1.25rem 1.35rem;
+      box-shadow:var(--shadow); position:relative;
+    }
+    .card .num {
+      font-family:"Fraunces",serif; font-size:1.5rem; color:var(--accent); font-weight:700; margin-bottom:.35rem;
+    }
+    .card h3 { margin:.2rem 0 .45rem; font-size:1.1rem; }
+    .card p { margin:0; color:var(--muted); font-size:.95rem; }
+    .problem {
+      display:grid; grid-template-columns:1.1fr .9fr; gap:1.25rem; align-items:stretch;
+    }
+    @media (max-width:800px){ .problem { grid-template-columns:1fr; } }
+    .squiggle {
+      height:3px; width:72px; background:transparent; border:none; border-top:3px solid var(--accent);
+      border-radius:2px; margin:0 0 1rem; transform:rotate(-2deg);
+    }
+    .cta-band {
+      margin-top:3rem; padding:2rem; border-radius:24px; border:2px solid var(--ink);
+      background:linear-gradient(135deg,#FFE8DF 0%, var(--paper) 60%);
+      display:flex; flex-wrap:wrap; gap:1rem; justify-content:space-between; align-items:center;
+    }
+    .cta-band h2 { margin:0; font-size:1.45rem; }
+    .cta-band p { margin:.35rem 0 0; color:var(--muted); }
+    footer { border-top:1px solid var(--line); padding:1.5rem; text-align:center; color:var(--muted); font-size:.85rem; }
+  </style>
+</head>
+<body class="doodle-dots">
+  <nav class="nav">
+    <a class="brand" href="/">Deska<span>Radar</span></a>
+    <div class="nav-links">
+      <a class="btn btn-ghost" href="#jak">Jak to funguje</a>
+      <a class="btn" href="/login">Vyzkoušet demo</a>
+    </div>
+  </nav>
+  <div class="wrap">
+    <section class="hero">
+      <div class="stamp">JMK · OFN desky</div>
+      <h1>Stavební leady dřív, než se objeví v tendru</h1>
+      <p class="lead">DeskaRadar hlídá úřední desky Jihomoravského kraje (OFN JSON-LD), třídí stavební / záměr oznámení a posílá vám denní digest. Bez eDesky scrape. Bez generického SaaS fialového gradientu.</p>
+      <div class="hero-actions">
+        <a class="btn" href="/login">Otevřít demo appku</a>
+        <a class="btn btn-ghost" href="#problem">Proč to řešíme</a>
+      </div>
+    </section>
+
+    <section class="section" id="problem">
+      <div class="squiggle"></div>
+      <h2>Problém</h2>
+      <div class="problem">
+        <div class="card">
+          <h3>Desky jsou šum</h3>
+          <p>Stovky oznámení denně. Ruční kontrola eDesky a obecních webů žere hodiny — a stejně vám unikne územka vedle vašeho pozemku.</p>
+        </div>
+        <div class="card">
+          <h3>Co potřebujete</h3>
+          <p>Filtrované stavební leady podle obce / kraje, s jistotou klasifikace a exportem pro CRM. Ne další „AI platformu“.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="jak">
+      <div class="squiggle"></div>
+      <h2>Jak to funguje</h2>
+      <div class="grid">
+        <div class="card"><div class="num">01</div><h3>Sledujeme OFN feedy</h3><p>Živé JSON-LD zdroje JMK obcí. Cache 20 min, soft re-warm na pozadí.</p></div>
+        <div class="card"><div class="num">02</div><h3>Klasifikujeme záměry</h3><p>Stavební / územní klíčová slova → jistota vysoká / střední + matched terms.</p></div>
+        <div class="card"><div class="num">03</div><h3>Digest &amp; alerty</h3><p>Denní digest podle obce, alerty za 24 h dle vašich preferencí, CSV export.</p></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="squiggle"></div>
+      <h2>Funkce</h2>
+      <div class="grid">
+        <div class="card"><h3>Filtry leadů</h3><p>Obec / kraj, kategorie, jistota, datum, fulltext query.</p></div>
+        <div class="card"><h3>Karty leadů</h3><p>Hierarchie: jistota → název → obec → zdroj. Prázdné stavy s návodem.</p></div>
+        <div class="card"><h3>Export CSV</h3><p>Stažení filtrovaných leadů pro Excel / CRM jedním klikem.</p></div>
+        <div class="card"><h3>Alert prefs</h3><p>Jen vysoká jistota, vybrané obce, e-mail stub — uloženo v SQLite.</p></div>
+      </div>
+    </section>
+
+    <div class="cta-band">
+      <div>
+        <h2>Připraveni na první digest?</h2>
+        <p>Demo účet: libovolný e-mail + heslo <strong>demo</strong></p>
+      </div>
+      <a class="btn" href="/login">Přihlásit se do appky →</a>
+    </div>
+  </div>
+  <footer>Zdroje: OFN JSON-LD (NKOD). Brno CC BY 4.0. DeskaRadar není oficiální produkt kraje.</footer>
+</body>
+</html>

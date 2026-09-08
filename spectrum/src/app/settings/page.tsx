@@ -6,7 +6,7 @@ export default function SettingsPage() {
     <main className="container">
       <div className="page-head">
         <div>
-          <h1 style={{ marginBottom: "0.35rem" }}>Nastavení / Připojení ČTÚ</h1>
+          <h1>Nastavení / Připojení ČTÚ</h1>
           <p className="muted" style={{ marginTop: 0 }}>
             Stub pro budoucí live sync.{" "}
             <span className="badge badge-warn">bez auto-prodloužení</span>
@@ -29,13 +29,35 @@ export default function SettingsPage() {
 
       <section className="card">
         <h2>Co funguje teď</h2>
-        <ul className="muted">
+        <ul className="muted" style={{ marginBottom: 0 }}>
           <li>Upload CSV / XLSX → bucket kalendář + alerty k obnově</li>
           <li>Datumy: unix i ISO (i smíšeně v jednom souboru)</li>
           <li>
             <strong>Bez auto-prodloužení</strong> — obnovu děláte vy v portálu ČTÚ
           </li>
+          <li>
+            Data zůstávají v prohlížeči (<code>localStorage</code>)
+          </li>
         </ul>
+      </section>
+
+      <section className="card">
+        <h2>Roadmapa připojení</h2>
+        <div className="grid-2">
+          <div>
+            <span className="badge">teď</span>
+            <p className="muted" style={{ margin: "0.5rem 0 0" }}>
+              Upload-only workflow, dry-run formulář, doménový kalendář Europe/Prague.
+            </p>
+          </div>
+          <div>
+            <span className="badge badge-warn">brzy</span>
+            <p className="muted" style={{ margin: "0.5rem 0 0" }}>
+              Live access-token sync na rlantest / rlan.ctu.gov.cz — pořád bez
+              auto-prodloužení.
+            </p>
+          </div>
+        </div>
       </section>
 
       <p className="footer-note">

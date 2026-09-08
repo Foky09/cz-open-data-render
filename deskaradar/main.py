@@ -49,7 +49,7 @@ DEMO_PASSWORD = "demo"
 SESSION_COOKIE = "dr_session"
 SESSION_TTL_S = 7 * 24 * 3600
 
-app = FastAPI(title="DeskaRadar", version="0.2.1")
+app = FastAPI(title="DeskaRadar", version="0.3.0")
 app.mount("/static", StaticFiles(directory=str(STATIC)), name="static")
 
 _lock = threading.Lock()
@@ -278,6 +278,7 @@ def _filter_leads(
     category: str | None = None,
     date_from: str | None = None,
     date_to: str | None = None,
+    query: str | None = None,
 ) -> list[dict[str, Any]]:
     out = leads
     if confidence:
@@ -289,6 +290,20 @@ def _filter_leads(
     if category:
         c = category.strip().lower()
         out = [L for L in out if (L.get("category") or "").lower() == c]
+    if query:
+        q = query.strip().lower()
+        if q:
+            def _hit(L: dict[str, Any]) -> bool:
+                hay = " ".join(
+                    [
+                        str(L.get("title_redacted") or ""),
+                        str(L.get("municipality") or ""),
+                        str(L.get("category") or ""),
+                        " ".join(L.get("matched_terms") or []),
+                    ]
+                ).lower()
+                return q in hay
+            out = [L for L in out if _hit(L)]
     df = date_from_iso(date_from) if date_from else None
     dt = date_from_iso(date_to) if date_to else None
     if df or dt:
@@ -363,6 +378,14 @@ def _auth_error() -> JSONResponse:
 
 @app.get("/")
 def index(dr_session: str | None = Cookie(default=None, alias=SESSION_COOKIE)):
+    """Public landing; logged-in users go straight to the app."""
+    if _require_user(dr_session):
+        return RedirectResponse("/app", status_code=302)
+    return FileResponse(STATIC / "landing.html")
+
+
+@app.get("/app")
+def app_page(dr_session: str | None = Cookie(default=None, alias=SESSION_COOKIE)):
     if not _require_user(dr_session):
         return RedirectResponse("/login", status_code=302)
     return FileResponse(STATIC / "app.html")
@@ -371,7 +394,7 @@ def index(dr_session: str | None = Cookie(default=None, alias=SESSION_COOKIE)):
 @app.get("/login")
 def login_page(dr_session: str | None = Cookie(default=None, alias=SESSION_COOKIE)):
     if _require_user(dr_session):
-        return RedirectResponse("/", status_code=302)
+        return RedirectResponse("/app", status_code=302)
     return FileResponse(STATIC / "login.html")
 
 
@@ -501,6 +524,7 @@ def api_leads(
     category: str | None = None,
     date_from: str | None = Query(None, description="YYYY-MM-DD"),
     date_to: str | None = Query(None, description="YYYY-MM-DD"),
+    q: str | None = Query(None, description="Fulltext query (title/obec/kategorie)"),
     refresh: bool = Query(False),
     dr_session: str | None = Cookie(default=None, alias=SESSION_COOKIE),
 ):
@@ -514,6 +538,7 @@ def api_leads(
         category=category,
         date_from=date_from,
         date_to=date_to,
+        query=q,
     )
     munis = sorted({L.get("municipality") or "" for L in snap["leads"] if L.get("municipality")})
     cats = sorted({L.get("category") or "" for L in snap["leads"] if L.get("category")})
@@ -534,12 +559,77 @@ def api_leads(
             "category": category,
             "date_from": date_from,
             "date_to": date_to,
+            "q": q,
         },
         "municipalities": munis,
         "categories": cats,
         "leads": [_lead_public(L) for L in filtered],
         "error": snap["error"],
     }
+
+
+@app.get("/api/leads.csv")
+def api_leads_csv(
+    confidence: str | None = Query("high,medium"),
+    municipality: str | None = None,
+    category: str | None = None,
+    date_from: str | None = Query(None),
+    date_to: str | None = Query(None),
+    q: str | None = Query(None),
+    dr_session: str | None = Cookie(default=None, alias=SESSION_COOKIE),
+):
+    """Export currently filtered leads as CSV (UTF-8 BOM for Excel)."""
+    import csv
+    import io
+
+    if not _require_user(dr_session):
+        return _auth_error()
+    snap = _ensure_data(force=False)
+    filtered = _filter_leads(
+        snap["leads"],
+        confidence=confidence,
+        municipality=municipality,
+        category=category,
+        date_from=date_from,
+        date_to=date_to,
+        query=q,
+    )
+    buf = io.StringIO()
+    buf.write("\ufeff")
+    w = csv.writer(buf, delimiter=";")
+    w.writerow(
+        [
+            "obec",
+            "publikovano",
+            "kategorie",
+            "jistota",
+            "skore",
+            "titulek",
+            "url",
+            "matched_terms",
+        ]
+    )
+    for L in filtered:
+        pub = _lead_public(L)
+        w.writerow(
+            [
+                pub.get("municipality") or "",
+                pub.get("published_at") or "",
+                pub.get("category") or "",
+                pub.get("confidence") or "",
+                pub.get("confidence_score") or "",
+                pub.get("title_redacted") or "",
+                pub.get("url") or "",
+                ", ".join(pub.get("matched_terms") or []),
+            ]
+        )
+    from fastapi.responses import Response as FastResponse
+
+    return FastResponse(
+        content=buf.getvalue(),
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": 'attachment; filename="deskaradar-leads.csv"'},
+    )
 
 
 @app.get("/api/digest")

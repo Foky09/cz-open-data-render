@@ -233,10 +233,11 @@ def _startup() -> None:
 
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
+    """Public landing; logged-in users go to dashboard."""
     user = current_user(request)
-    if not user:
-        return RedirectResponse("/login", status_code=303)
-    return RedirectResponse("/dashboard", status_code=303)
+    if user:
+        return RedirectResponse("/dashboard", status_code=303)
+    return templates.TemplateResponse(request, "landing.html", {"user": None})
 
 
 @app.get("/signup", response_class=HTMLResponse)
@@ -279,7 +280,7 @@ def login(request: Request, email: str = Form(...), password: str = Form(...)):
 @app.post("/logout")
 def logout(request: Request):
     request.session.clear()
-    return RedirectResponse("/login", status_code=303)
+    return RedirectResponse("/", status_code=303)
 
 
 @app.get("/dashboard", response_class=HTMLResponse)
@@ -321,9 +322,19 @@ def watchlist_add(
     local_id = local_id.strip().upper()
     country = (country or "CZ").strip().upper()
     store = read_store()
+    items = [w for w in store["watchlist"] if w["userId"] == user["id"]]
+    if not local_id or len(local_id) < 3:
+        return templates.TemplateResponse(
+            request,
+            "watchlist.html",
+            {"user": user, "items": items, "error": "Zadejte platné IČZ / IČOB (min. 3 znaky, např. CZK00551)."},
+            status_code=400,
+        )
     if any(w["userId"] == user["id"] and w["localId"].upper() == local_id for w in store["watchlist"]):
-        items = [w for w in store["watchlist"] if w["userId"] == user["id"]]
-        return templates.TemplateResponse(request, "watchlist.html", {"user": user, "items": items, "error": "Already on watchlist"},
+        return templates.TemplateResponse(
+            request,
+            "watchlist.html",
+            {"user": user, "items": items, "error": "Tento partner už je na watchlistu."},
             status_code=400,
         )
     item = {
@@ -377,7 +388,24 @@ def alert_detail(request: Request, alert_id: str):
     alert = next((a for a in store["alerts"] if a["id"] == alert_id and a["userId"] == user["id"]), None)
     if not alert:
         return RedirectResponse("/alerts", status_code=303)
-    return templates.TemplateResponse(request, "alert_detail.html", {"user": user, "alert": alert})
+    status_by = {s["localId"].upper(): s for s in store.get("statuses", [])}
+    partners = []
+    for pid in alert.get("partnerIds") or []:
+        st = status_by.get(str(pid).upper(), {})
+        partners.append(
+            {
+                "localId": pid,
+                "status": st.get("status", "—"),
+                "operatorIco": st.get("operatorIco"),
+                "wasteCodeCount": st.get("wasteCodeCount", 0),
+                "changeSummary": st.get("changeSummary"),
+            }
+        )
+    return templates.TemplateResponse(
+        request,
+        "alert_detail.html",
+        {"user": user, "alert": alert, "partners": partners},
+    )
 
 
 @app.post("/alerts/run")

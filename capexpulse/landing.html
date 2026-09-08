@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CapexPulse — ICT capex movers z MONITOR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --paper:#F7F4EF; --ink:#1C1917; --muted:#78716C; --line:#E7E0D6;
+      --card:#FFFCFA; --blue:#1D4ED8; --blue-dark:#1E3A8A; --lime:#84CC16;
+      --shadow:0 8px 28px rgba(28,25,23,.08);
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin:0; font-family:"Nunito Sans",system-ui,sans-serif; background:var(--paper); color:var(--ink);
+      background-image:radial-gradient(circle, rgba(29,78,216,.16) 1px, transparent 1.2px);
+      background-size:20px 20px; line-height:1.55;
+    }
+    h1,h2,h3 { font-family:"Fraunces",Georgia,serif; letter-spacing:-.02em; }
+    .nav {
+      max-width:1100px; margin:0 auto; padding:1rem 1.5rem;
+      display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;
+    }
+    .brand { font-family:"Fraunces",serif; font-weight:700; font-size:1.25rem; text-decoration:none; color:var(--ink); }
+    .brand span { color:var(--blue); }
+    .brand em { color:var(--lime); font-style:normal; }
+    .btn {
+      display:inline-flex; padding:.7rem 1.15rem; border-radius:999px; border:2px solid var(--ink);
+      background:var(--blue); color:#fff; font-weight:700; text-decoration:none;
+      box-shadow:3px 3px 0 var(--ink);
+    }
+    .btn-ghost { background:transparent; color:var(--ink); box-shadow:none; }
+    .wrap { max-width:1100px; margin:0 auto; padding:0 1.5rem 3rem; }
+    .hero {
+      background:var(--card); border:2px solid var(--ink); border-radius:28px; padding:2.4rem 2rem;
+      box-shadow:var(--shadow); position:relative; overflow:hidden; margin-bottom:2rem;
+    }
+    .hero::after {
+      content:""; position:absolute; right:24px; bottom:24px; width:18px; height:18px;
+      background:var(--lime); border-radius:50%; box-shadow:0 0 0 8px rgba(132,204,22,.25);
+      animation:pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 50% { box-shadow:0 0 0 14px rgba(132,204,22,.05); } }
+    .stamp {
+      display:inline-block; font-size:.72rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase;
+      border:2px solid var(--blue); color:var(--blue-dark); padding:.25rem .55rem; border-radius:6px;
+      transform:rotate(-2deg); margin-bottom:1rem;
+    }
+    .hero h1 { margin:0 0 .75rem; font-size:clamp(1.8rem,4vw,2.6rem); max-width:16ch; }
+    .hero p { color:var(--muted); max-width:42rem; margin:0 0 1.4rem; font-size:1.05rem; }
+    .actions { display:flex; gap:.75rem; flex-wrap:wrap; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem; }
+    .card {
+      background:var(--card); border:1.5px solid var(--line); border-radius:18px; padding:1.2rem;
+      box-shadow:var(--shadow);
+    }
+    .card .num { font-family:"Fraunces",serif; color:var(--blue); font-size:1.4rem; font-weight:700; }
+    .card h3 { margin:.25rem 0 .4rem; }
+    .card p { margin:0; color:var(--muted); font-size:.95rem; }
+    .squiggle { width:64px; height:0; border-top:3px solid var(--lime); margin:0 0 .75rem; }
+    .section { margin:2.5rem 0; }
+    .cta {
+      margin-top:2rem; padding:1.5rem 1.75rem; border:2px solid var(--ink); border-radius:22px;
+      background:linear-gradient(135deg,#DBEAFE 0%, var(--paper) 60%);
+      display:flex; flex-wrap:wrap; gap:1rem; justify-content:space-between; align-items:center;
+    }
+    footer { border-top:1px solid var(--line); padding:1.25rem; text-align:center; color:var(--muted); font-size:.85rem; }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <a class="brand" href="/">Capex<span>Pulse</span> <em>●</em></a>
+    <a class="btn" href="/app">Otevřít dashboard</a>
+  </nav>
+  <div class="wrap">
+    <section class="hero">
+      <div class="stamp">MONITOR · ICT capex</div>
+      <h1>Kdo skokově zvýšil ICT investice</h1>
+      <p>CapexPulse srovnává Δ SUM(ZU_ROZKZ) u položky 6125 napříč ÚSC/OSS v datech MONITOR státní pokladny. Weekly movers, flagy clean / new_entity / suspect — signal to verify, not gospel.</p>
+      <div class="actions">
+        <a class="btn" href="/app">Spustit movers dashboard</a>
+        <a class="btn btn-ghost" href="#jak">Jak to funguje</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="squiggle"></div>
+      <h2>Problém</h2>
+      <div class="grid">
+        <div class="card"><h3>Capex je skrytý v rozpočtech</h3><p>Bez Δ filtru nevidíte, kdo právě nakupuje ICT — a obchodní timing uteče.</p></div>
+        <div class="card"><h3>Šum v datech</h3><p>New entity a negative prior nesmí být default lead. Proto máme flagy.</p></div>
+      </div>
+    </section>
+
+    <section class="section" id="jak">
+      <div class="squiggle"></div>
+      <h2>Jak to funguje</h2>
+      <div class="grid">
+        <div class="card"><div class="num">01</div><h3>Načteme periody</h3><p>FinM ÚSC primary, FinOSS secondary — MONITOR open data.</p></div>
+        <div class="card"><div class="num">02</div><h3>Spočítáme Δ</h3><p>|Δ| ≥ 100 000 Kč, metric contract v2.1, dry-run MONITOR adapter.</p></div>
+        <div class="card"><div class="num">03</div><h3>Filtujeme leady</h3><p>Segment, flag, fulltext search, KPI chips, odkaz do MONITOR.</p></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="squiggle"></div>
+      <h2>Funkce</h2>
+      <div class="grid">
+        <div class="card"><h3>KPI chips</h3><p>Počet movers, suma Δ, podíl clean — hned nahoře.</p></div>
+        <div class="card"><h3>Search + filtry</h3><p>Hledání podle názvu / IČO, segment ÚSC/OSS, flag.</p></div>
+        <div class="card"><h3>MONITOR odkazy</h3><p>Každý řádek otevře účetní jednotku v MONITOR.</p></div>
+      </div>
+    </section>
+
+    <div class="cta">
+      <div>
+        <h2 style="margin:0">Podívejte se na movers</h2>
+        <p style="margin:.35rem 0 0;color:var(--muted)">Veřejný dashboard, bez loginu.</p>
+      </div>
+      <a class="btn" href="/app">Otevřít appku →</a>
+    </div>
+  </div>
+  <footer>
+    Zdroj: MFČR – MONITOR. MFČR produkt CapexPulse nepodporuje.
+    <a href="https://monitor.statnipokladna.gov.cz/datovy-katalog/licence" target="_blank" rel="noreferrer">Licence</a>
+  </footer>
+</body>
+</html>

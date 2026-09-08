@@ -82,6 +82,17 @@ def generate(
     rid = ruian_id.strip()
     ku_s = ku.strip()
     pn = parcel_number.strip()
+    # Friendly validation: partial k.ú. / parcel without demo → clear Czech error
+    if not demo and not rid and ((ku_s and not pn) or (pn and not ku_s)):
+        return templates.TemplateResponse(
+            request,
+            "saas/app.html",
+            _ctx(
+                request,
+                error="Doplňte katastrální území i parcelní číslo, nebo zadejte RÚIAN Id, případně nechte zapnutý Demo mode.",
+            ),
+            status_code=400,
+        )
     use_demo = bool(demo) or (not rid and not (ku_s and pn))
     req = PackRequest(
         country="CZ",

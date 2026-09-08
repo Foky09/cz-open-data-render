@@ -4,56 +4,94 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CapexPulse — ICT capex movers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
-    :root { --bg:#0f1419; --panel:#1a222c; --text:#e7eef7; --muted:#9aa8b6; --accent:#3dd6c6; --pos:#5ddea5; --neg:#f07178; --border:#2a3542; --warn:#e6c07b; }
+    :root {
+      --paper:#F7F4EF; --ink:#1C1917; --muted:#78716C; --line:#E7E0D6;
+      --card:#FFFCFA; --blue:#1D4ED8; --blue-dark:#1E3A8A; --lime:#84CC16;
+      --pos:#15803D; --neg:#B91C1C; --warn:#A16207; --shadow:0 8px 24px rgba(28,25,23,.07);
+    }
     * { box-sizing: border-box; }
-    body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:var(--bg); color:var(--text); }
-    header { padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); display:flex; flex-wrap:wrap; gap:1rem; align-items:flex-end; justify-content:space-between; }
-    h1 { margin:0; font-size:1.25rem; letter-spacing:.02em; }
+    body {
+      margin:0; font-family:"Nunito Sans",system-ui,sans-serif; background:var(--paper); color:var(--ink);
+      background-image:radial-gradient(circle, rgba(29,78,216,.14) 1px, transparent 1.2px);
+      background-size:20px 20px;
+    }
+    h1,h2 { font-family:"Fraunces",Georgia,serif; letter-spacing:-.02em; }
+    header {
+      padding:1.1rem 1.5rem; border-bottom:2px solid var(--ink); background:var(--card);
+      display:flex; flex-wrap:wrap; gap:1rem; align-items:flex-end; justify-content:space-between;
+    }
+    h1 { margin:0; font-size:1.3rem; }
+    h1 span { color:var(--blue); }
+    h1 em { color:var(--lime); font-style:normal; font-size:.9rem; }
     .sub { color:var(--muted); font-size:.9rem; margin-top:.35rem; }
+    .top-links a { font-weight:700; color:var(--blue-dark); text-decoration:none; margin-left:.75rem; font-size:.9rem; }
     main { padding:1.25rem 1.5rem 2rem; max-width:1200px; margin:0 auto; }
-    .controls { display:flex; flex-wrap:wrap; gap:.75rem; margin-bottom:1rem; align-items:center; }
-    label { font-size:.85rem; color:var(--muted); display:flex; flex-direction:column; gap:.25rem; }
-    select, button { background:var(--panel); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:.45rem .7rem; }
-    button { cursor:pointer; }
-    button.active { border-color:var(--accent); color:var(--accent); }
-    .stats { color:var(--muted); font-size:.85rem; }
-    .table-wrap { overflow:auto; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
+    .kpis { display:flex; flex-wrap:wrap; gap:.65rem; margin-bottom:1rem; }
+    .kpi {
+      background:var(--card); border:1.5px solid var(--line); border-radius:14px;
+      padding:.7rem 1rem; min-width:130px; box-shadow:var(--shadow);
+    }
+    .kpi .v { font-family:"Fraunces",serif; font-size:1.35rem; font-weight:700; color:var(--blue); }
+    .kpi .v.lime { color:#4D7C0F; }
+    .kpi .l { font-size:.72rem; color:var(--muted); font-weight:800; text-transform:uppercase; letter-spacing:.04em; }
+    .controls { display:flex; flex-wrap:wrap; gap:.75rem; margin-bottom:1rem; align-items:end; }
+    label { font-size:.75rem; color:var(--muted); display:flex; flex-direction:column; gap:.25rem; font-weight:700; text-transform:uppercase; letter-spacing:.03em; }
+    select, input[type=search], button {
+      background:#fff; color:var(--ink); border:1.5px solid var(--line); border-radius:12px;
+      padding:.5rem .7rem; font:inherit; font-size:.9rem; text-transform:none; letter-spacing:0; font-weight:600;
+    }
+    input[type=search] { min-width:200px; }
+    button { cursor:pointer; border:2px solid var(--ink); border-radius:999px; background:var(--blue); color:#fff; box-shadow:2px 2px 0 var(--ink); }
+    button.secondary { background:#fff; color:var(--ink); }
+    button.active { background:var(--lime); color:var(--ink); }
+    .table-wrap { overflow:auto; border:1.5px solid var(--line); border-radius:16px; background:var(--card); box-shadow:var(--shadow); }
     table { width:100%; border-collapse:collapse; font-size:.9rem; }
-    th, td { padding:.55rem .7rem; border-bottom:1px solid var(--border); text-align:left; white-space:nowrap; }
-    th { color:var(--muted); font-weight:600; position:sticky; top:0; background:var(--panel); }
+    th, td { padding:.6rem .7rem; border-bottom:1px solid var(--line); text-align:left; white-space:nowrap; }
+    th { color:var(--muted); font-weight:800; position:sticky; top:0; background:var(--card); font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; }
     td.num { text-align:right; font-variant-numeric:tabular-nums; }
-    .delta.pos { color:var(--pos); }
-    .delta.neg { color:var(--neg); }
-    .pill, .flag { font-size:.75rem; padding:.15rem .45rem; border-radius:999px; border:1px solid var(--border); }
-    .flag-clean { border-color:var(--pos); color:var(--pos); }
-    .flag-new_entity { border-color:var(--accent); color:var(--accent); }
-    .flag-suspect_negative_prior { border-color:var(--warn); color:var(--warn); }
-    a { color:var(--accent); }
-    .panel { margin-top:1.25rem; padding:1rem 1.1rem; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
-    .panel h2 { margin:0 0 .5rem; font-size:1rem; }
+    .delta.pos { color:var(--pos); font-weight:700; }
+    .delta.neg { color:var(--neg); font-weight:700; }
+    .pill, .flag { font-size:.75rem; padding:.15rem .5rem; border-radius:999px; border:1px solid var(--line); font-weight:700; }
+    .flag-clean { border-color:#86EFAC; color:var(--pos); background:#DCFCE7; }
+    .flag-new_entity { border-color:#93C5FD; color:var(--blue); background:#DBEAFE; }
+    .flag-suspect_negative_prior { border-color:#FCD34D; color:var(--warn); background:#FEF3C7; }
+    a { color:var(--blue-dark); font-weight:700; }
+    .panel { margin-top:1.25rem; padding:1rem 1.1rem; border:1.5px solid var(--line); border-radius:16px; background:var(--card); }
+    .panel h2 { margin:0 0 .5rem; font-size:1.05rem; }
     .panel ul { margin:.4rem 0 0 1.1rem; color:var(--muted); }
-    footer { margin-top:1.5rem; padding:1rem 1.5rem 2rem; border-top:1px solid var(--border); color:var(--muted); font-size:.85rem; line-height:1.45; }
+    footer { margin-top:1.5rem; padding:1rem 1.5rem 2rem; border-top:1px solid var(--line); color:var(--muted); font-size:.85rem; line-height:1.45; }
     .soft { font-style:italic; }
-    .empty { color:var(--muted); padding:1rem; }
-    code { font-size:.85em; }
+    .empty { color:var(--muted); padding:1.5rem; text-align:center; }
+    .empty strong { display:block; font-family:"Fraunces",serif; color:var(--ink); margin-bottom:.35rem; }
+    code { font-size:.85em; background:#EEF2FF; padding:1px 5px; border-radius:4px; }
   </style>
 </head>
 <body>
   <header>
     <div>
-      <h1>CapexPulse — Weekly ICT capex movers</h1>
-      <div class="sub" id="subtitle">Loading…</div>
+      <h1>Capex<span>Pulse</span> <em>●</em> — ICT movers</h1>
+      <div class="sub" id="subtitle">Načítám…</div>
     </div>
-    <div class="stats" id="stats"></div>
+    <div class="top-links">
+      <a href="/">← Landing</a>
+      <a href="#" id="btn-explainer">Metric v2.1</a>
+    </div>
   </header>
   <main>
+    <div class="kpis" id="kpis"></div>
     <div class="controls">
+      <label>Hledat
+        <input type="search" id="q" placeholder="název nebo IČO…" />
+      </label>
       <label>Segment
         <select id="segment">
           <option value="ÚSC" selected>ÚSC</option>
           <option value="OSS">OSS</option>
-          <option value="ALL">All</option>
+          <option value="ALL">Vše</option>
         </select>
       </label>
       <label>Flag
@@ -61,23 +99,26 @@
           <option value="clean" selected>clean (default)</option>
           <option value="new_entity">new_entity</option>
           <option value="suspect_negative_prior">suspect_negative_prior</option>
-          <option value="ALL">All flags</option>
+          <option value="ALL">Všechny flagy</option>
         </select>
       </label>
-      <button type="button" id="btn-explainer">Metric v2.1</button>
+      <button type="button" class="secondary" id="btn-clear">Reset filtrů</button>
     </div>
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
-            <th>#</th><th>Organisation</th><th>orgId (IČO)</th><th>Seg</th>
+            <th>#</th><th>Organizace</th><th>IČO</th><th>Seg</th>
             <th>Prev</th><th>Curr</th><th>Δ Kč</th><th>Flag</th><th>MONITOR</th>
           </tr>
         </thead>
         <tbody id="tbody"></tbody>
       </table>
+      <div class="empty" id="empty" hidden>
+        <strong>Žádní movers</strong>
+        Pro zvolené filtry nic neodpovídá — zkuste „Vše“ / jiné flagy / prázdné hledání.
+      </div>
     </div>
-    <p class="empty" id="empty" hidden>No movers for this filter.</p>
     <section class="panel" id="explainer" hidden>
       <h2>Metric contract v2.1</h2>
       <ul>
@@ -101,14 +142,41 @@
     const mon = (ico) => `https://monitor.statnipokladna.gov.cz/ucetni-jednotka/${ico}`;
     let payload = null;
 
-    function render() {
-      if (!payload) return;
+    function filteredRows() {
+      if (!payload) return [];
       const seg = document.getElementById('segment').value;
       const flag = document.getElementById('flag').value;
+      const q = (document.getElementById('q').value || '').trim().toLowerCase();
       let rows = payload.movers.slice();
       if (seg !== 'ALL') rows = rows.filter(r => r.segment === seg);
       if (flag !== 'ALL') rows = rows.filter(r => r.flag === flag);
+      if (q) {
+        rows = rows.filter(r => {
+          const name = String(r.orgName || r.name || '').toLowerCase();
+          const ico = String(r.orgId || r.ico || '').toLowerCase();
+          return name.includes(q) || ico.includes(q);
+        });
+      }
       rows.sort((a,b) => b.delta - a.delta);
+      return rows;
+    }
+
+    function renderKpis(rows) {
+      const sumDelta = rows.reduce((a,r) => a + (r.delta || 0), 0);
+      const cleanN = rows.filter(r => r.flag === 'clean').length;
+      const posN = rows.filter(r => (r.delta || 0) > 0).length;
+      document.getElementById('kpis').innerHTML = `
+        <div class="kpi"><div class="v">${rows.length}</div><div class="l">Movers</div></div>
+        <div class="kpi"><div class="v lime">${fmt(sumDelta)}</div><div class="l">Σ Δ Kč</div></div>
+        <div class="kpi"><div class="v">${cleanN}</div><div class="l">Clean</div></div>
+        <div class="kpi"><div class="v">${posN}</div><div class="l">Kladné Δ</div></div>
+      `;
+    }
+
+    function render() {
+      if (!payload) return;
+      const rows = filteredRows();
+      renderKpis(rows);
       const tbody = document.getElementById('tbody');
       tbody.innerHTML = rows.map((r,i) => `
         <tr>
@@ -120,30 +188,38 @@
           <td class="num">${fmt(r.currAmount ?? r.curr)}</td>
           <td class="num delta ${(r.delta>=0)?'pos':'neg'}">${fmt(r.delta)}</td>
           <td><span class="flag flag-${r.flag}">${r.flag}</span></td>
-          <td><a href="${mon(r.orgId || r.ico)}" target="_blank" rel="noreferrer">open</a></td>
+          <td><a href="${mon(r.orgId || r.ico)}" target="_blank" rel="noreferrer">otevřít</a></td>
         </tr>`).join('');
       document.getElementById('empty').hidden = rows.length > 0;
-      document.getElementById('stats').textContent = `${rows.length} rows · default ÚSC/clean`;
+      tbody.style.display = rows.length ? '' : 'none';
     }
 
     document.getElementById('segment').addEventListener('change', render);
     document.getElementById('flag').addEventListener('change', render);
-    document.getElementById('btn-explainer').addEventListener('click', () => {
+    document.getElementById('q').addEventListener('input', render);
+    document.getElementById('btn-clear').addEventListener('click', () => {
+      document.getElementById('segment').value = 'ÚSC';
+      document.getElementById('flag').value = 'clean';
+      document.getElementById('q').value = '';
+      render();
+    });
+    document.getElementById('btn-explainer').addEventListener('click', (e) => {
+      e.preventDefault();
       const el = document.getElementById('explainer');
       el.hidden = !el.hidden;
     });
 
-    fetch('./data/movers-2026006.json')
+    fetch('/data/movers-2026006.json')
       .then(r => r.json())
       .then(data => {
         payload = data;
         const m = data.meta || {};
         document.getElementById('subtitle').textContent =
-          `Period ${m.period || ''} vs ${m.prevPeriod || ''} · položka ${m.budgetLineCode || '6125'} · metric ${m.metricContract || 'v2.1'}`;
+          `Perioda ${m.period || ''} vs ${m.prevPeriod || ''} · položka ${m.budgetLineCode || '6125'} · metric ${m.metricContract || 'v2.1'}`;
         render();
       })
       .catch(err => {
-        document.getElementById('subtitle').textContent = 'Failed to load movers JSON: ' + err;
+        document.getElementById('subtitle').textContent = 'Nepodařilo se načíst movers JSON: ' + err;
       });
   </script>
 </body>

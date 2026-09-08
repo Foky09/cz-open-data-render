@@ -2,10 +2,29 @@
 {% block title %}{{ alert.subject }} — WasteGate{% endblock %}
 {% block content %}
 <section class="card">
-  <p><a href="/alerts">← Alerts</a></p>
+  <p><a href="/alerts">← Zpět na alerty</a></p>
   <h1>{{ alert.subject }}</h1>
-  <p class="muted">{{ alert.createdAt }} · {{ alert.kind }}</p>
-  <h2>Email preview</h2>
+  <p class="muted">{{ alert.createdAt }} · <span class="pill">{{ alert.kind }}</span></p>
+
+  {% if partners %}
+  <h2 style="color:var(--ink)">Partneři v alertu</h2>
+  <table>
+    <thead><tr><th>IČZ</th><th>Status</th><th>IČO</th><th>Kódy</th><th>Změna</th></tr></thead>
+    <tbody>
+      {% for p in partners %}
+      <tr>
+        <td><code>{{ p.localId }}</code></td>
+        <td><span class="pill">{{ p.status }}</span></td>
+        <td>{{ p.operatorIco or "—" }}</td>
+        <td>{{ p.wasteCodeCount }}</td>
+        <td class="muted">{{ p.changeSummary or "—" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  <h2 style="color:var(--ink)">Náhled e-mailu</h2>
   <pre class="email">Subject: {{ alert.subject }}
 
 {{ alert.body }}</pre>

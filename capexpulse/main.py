@@ -1,4 +1,4 @@
-"""CapexPulse movers dashboard — static UI + FastAPI for Railway wave 1."""
+"""CapexPulse movers dashboard — landing + app (Render wave UX)."""
 from __future__ import annotations
 
 import os
@@ -21,7 +21,18 @@ def healthz() -> dict[str, str]:
 
 
 @app.get("/")
-def index() -> FileResponse:
+def landing() -> FileResponse:
+    return FileResponse(ROOT / "landing.html")
+
+
+@app.get("/app")
+def app_page() -> FileResponse:
+    return FileResponse(ROOT / "index.html")
+
+
+# Back-compat: old bookmarks for the SPA shell
+@app.get("/index.html")
+def index_html() -> FileResponse:
     return FileResponse(ROOT / "index.html")
 
 

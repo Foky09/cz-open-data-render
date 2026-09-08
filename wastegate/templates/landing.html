@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>WasteGate — hlídání partnerů VISOH</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/style.css"/>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="/">Waste<span>Gate</span></a>
+    <nav>
+      <a href="/login">Přihlášení</a>
+      <a class="btn-link" href="/signup" style="padding:.45rem .9rem;font-size:.85rem">Registrace</a>
+    </nav>
+  </header>
+  <main>
+    <section class="hero-land">
+      <div class="stamp">VISOH2 · MŽP</div>
+      <h1>Hlídáme status odpadových partnerů za vás</h1>
+      <p>WasteGate sleduje zařízení a obchodníky v registru VISOH (IČZ / IČOB), ukládá watchlist a generuje e-mailové alerty při změně statusu. Amber papír, ne další dark SaaS.</p>
+      <div class="hero-actions">
+        <a class="btn-link" href="/signup">Vyzkoušet zdarma</a>
+        <a class="btn-ghost" href="/login">Demo login</a>
+      </div>
+    </section>
+
+    <div class="squiggle"></div>
+    <h2 style="color:var(--ink);font-size:1.5rem;margin:0 0 .75rem">Problém</h2>
+    <div class="grid-3">
+      <div class="card"><h3>Partner změní status</h3><p class="muted" style="margin:0">Bez hlídání zjistíte pozdě, že zařízení není aktivní — a compliance bolí.</p></div>
+      <div class="card"><h3>Exporty jsou hlučné</h3><p class="muted" style="margin:0">Denní VISOH exporty jsou velké. Potřebujete jen své IČZ, ne celý registr.</p></div>
+      <div class="card"><h3>E-mail, ne dashboard-only</h3><p class="muted" style="margin:0">Alert musí dorazit do schránky. WasteGate generuje preview + outbox.</p></div>
+    </div>
+
+    <div class="squiggle"></div>
+    <h2 style="color:var(--ink);font-size:1.5rem;margin:0 0 .75rem">Jak to funguje</h2>
+    <div class="grid-3">
+      <div class="card"><h3>1. Watchlist</h3><p class="muted" style="margin:0">Přidejte IČZ / IČOB partnerů. Lookup ze snapshotu VISOH.</p></div>
+      <div class="card"><h3>2. Status dashboard</h3><p class="muted" style="margin:0">Tabulka se statusem, IČO provozovatele, počtem kódů odpadu.</p></div>
+      <div class="card"><h3>3. Alerty</h3><p class="muted" style="margin:0">Manuální / baseline e-mail s náhledem a seznamem partnerů.</p></div>
+    </div>
+
+    <div class="squiggle"></div>
+    <h2 style="color:var(--ink);font-size:1.5rem;margin:0 0 .75rem">Funkce</h2>
+    <div class="grid-3">
+      <div class="card"><h3>Badges statusů</h3><p class="muted" style="margin:0">Aktivní / neaktivní / nenalezeno — barevně a srozumitelně.</p></div>
+      <div class="card"><h3>Detail alertu</h3><p class="muted" style="margin:0">Náhled e-mailu + tabulka partnerů z daného běhu.</p></div>
+      <div class="card"><h3>Demo účet</h3><p class="muted" style="margin:0"><code>demo@wastegate.cz</code> / <code>demo1234</code></p></div>
+    </div>
+
+    <div class="cta-band">
+      <div>
+        <h2 style="margin:0;color:var(--ink)">Přidejte první IČZ</h2>
+        <p class="muted" style="margin:.35rem 0 0">Registrace zabere minutu. Seed watchlist už čeká.</p>
+      </div>
+      <a class="btn-link" href="/signup">Registrovat →</a>
+    </div>
+  </main>
+  <footer class="foot"><p>{{ FOOTER }}</p></footer>
+</body>
+</html>

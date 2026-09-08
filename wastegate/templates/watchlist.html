@@ -3,32 +3,38 @@
 {% block content %}
 <section class="card">
   <h1>Watchlist</h1>
+  <p class="muted" style="margin-top:0">Přidejte IČZ zařízení nebo IČOB obchodníka. Po uložení dohledáme status ze snapshotu VISOH.</p>
   {% if error %}<p class="err">{{ error }}</p>{% endif %}
   <form method="post" action="/watchlist/add" class="add">
-    <label>Country <input name="country" value="CZ" maxlength="2"/></label>
-    <label>Local ID (IČZ/IČOB) <input name="local_id" required placeholder="CZK00551"/></label>
-    <label>Label <input name="label" placeholder="Optional"/></label>
-    <button type="submit">Add</button>
+    <label>Země <input name="country" value="CZ" maxlength="2"/></label>
+    <label>IČZ / IČOB <input name="local_id" required placeholder="CZK00551"/></label>
+    <label>Label <input name="label" placeholder="Volitelný název"/></label>
+    <button type="submit">Přidat</button>
   </form>
+  {% if items %}
   <table>
-    <thead><tr><th>Country</th><th>ID</th><th>Kind</th><th>Label</th><th></th></tr></thead>
+    <thead><tr><th>Země</th><th>ID</th><th>Typ</th><th>Label</th><th></th></tr></thead>
     <tbody>
       {% for i in items %}
       <tr>
         <td>{{ i.country }}</td>
         <td><code>{{ i.localId }}</code></td>
-        <td>{{ i.kind }}</td>
+        <td><span class="pill">{{ i.kind }}</span></td>
         <td>{{ i.label }}</td>
         <td>
           <form method="post" action="/watchlist/{{ i.id }}/delete" class="inline">
-            <button type="submit" class="danger">Remove</button>
+            <button type="submit" class="danger">Odebrat</button>
           </form>
         </td>
       </tr>
-      {% else %}
-      <tr><td colspan="5" class="muted">No partners yet.</td></tr>
       {% endfor %}
     </tbody>
   </table>
+  {% else %}
+  <div class="empty">
+    <strong>Zatím žádní partneři</strong>
+    <p>Zadejte IČZ výše (např. z seed watchlistu day1).</p>
+  </div>
+  {% endif %}
 </section>
 {% endblock %}

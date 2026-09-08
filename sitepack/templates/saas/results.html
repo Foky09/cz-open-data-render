@@ -1,6 +1,12 @@
 {% extends "saas/base.html" %}
 {% block title %}Výsledky — {{ pack.parcel.ku_name }} {{ pack.parcel.parcel_number }}{% endblock %}
 {% block content %}
+<ul class="progress" aria-label="Průběh rešerše">
+  <li class="done"><span>Krok 1</span>Identita parcely</li>
+  <li class="done"><span>Krok 2</span>Vrstvy rizik</li>
+  <li class="current"><span>Krok 3</span>PDF / HTML report</li>
+</ul>
+
 <div class="meta-row">
   <span><strong>Země:</strong> {{ pack.country }}</span>
   <span><strong>Režim:</strong> {{ pack.mode_label }}</span>
@@ -24,11 +30,17 @@
   {% if pdf_ready %}
   <a class="btn" href="/files/{{ stem }}.pdf">Stáhnout PDF</a>
   {% else %}
-  <span class="btn btn-secondary" style="opacity:.6;cursor:not-allowed">PDF není k dispozici</span>
+  <span class="btn btn-secondary" style="opacity:.65;cursor:not-allowed" title="PDF se nepodařilo vygenerovat — použijte HTML report">PDF není k dispozici</span>
   {% endif %}
   <a class="btn btn-secondary" href="/files/{{ stem }}.html" target="_blank">Otevřít HTML report</a>
   <a class="btn btn-secondary" href="/app">Nová rešerše</a>
 </div>
+
+{% if not pdf_ready %}
+<div class="error" role="alert">
+  PDF se nevygenerovalo (chybí WeasyPrint / systémové knihovny). HTML report je připravený — otevřete ho výše nebo vytiskněte do PDF z prohlížeče.
+</div>
+{% endif %}
 
 <div class="warn">
   <strong>⚠ Bez KN ownership</strong>

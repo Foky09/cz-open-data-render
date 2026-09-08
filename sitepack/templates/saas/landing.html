@@ -1,12 +1,13 @@
 {% extends "saas/base.html" %}
-{% block title %}SitePack Pro — Parcelní rešerše{% endblock %}
+{% block title %}SitePack Pro — Parcelní rešerše pro developery{% endblock %}
 {% block content %}
 <section class="hero">
-  <h1>Parcelní rešerše pro developery</h1>
+  <div class="stamp">Česko · RÚIAN</div>
+  <h1>Parcelní rešerše bez KN ownership chaosu</h1>
   <p>
-    <strong>Česko (CZ)</strong> — AT/DE/IT později.
     Vložte RÚIAN Id nebo k.ú. + parcelní číslo. Získejte semafor rizik
     (povodně, radon, poddolování, sesuvy, územní plán) a stáhněte PDF — přímo v prohlížeči.
+    Papírový feel, ne fialový SaaS gradient.
   </p>
   <div class="hero-actions">
     <a class="btn btn-lg" href="/app">Spustit rešerši</a>
@@ -14,19 +15,37 @@
   </div>
 </section>
 
+<div class="squiggle"></div>
+<h2 class="section-title" style="margin-top:0">Problém</h2>
 <div class="grid-3">
   <div class="card">
-    <h3>1. Identita parcely</h3>
-    <p>RÚIAN Id nebo katastrální území + parcelní číslo. Žádná data o vlastnictví.</p>
+    <h3>Data jsou roztříštěná</h3>
+    <p>Povodně jinde, radon jinde, ÚP jinde. Developer ztrácí půl dne na jednu parcelu.</p>
   </div>
   <div class="card">
-    <h3>2. Vrstvy + semafor</h3>
-    <p>LIVE / STUB / FALLBACK badge u každé vrstvy. Loud disclaimers CZ.</p>
+    <h3>Ownership je past</h3>
+    <p>SitePack záměrně neřeší KN vlastnictví ani outreach — jen feasibility snapshot.</p>
   </div>
   <div class="card">
-    <h3>3. PDF v prohlížeči</h3>
-    <p>Stažení HTML/PDF reportu. CLI zůstává jen pro backend/dev.</p>
+    <h3>Potřebujete PDF teď</h3>
+    <p>Ne CLI v terminálu. Prohlížeč → semafor → HTML/PDF report.</p>
   </div>
+</div>
+
+<div class="squiggle"></div>
+<h2 class="section-title">Jak to funguje</h2>
+<div class="grid-3">
+  <div class="card"><div class="num">01</div><h3>Identita parcely</h3><p>RÚIAN Id nebo katastrální území + parcelní číslo. Žádná data o vlastnictví.</p></div>
+  <div class="card"><div class="num">02</div><h3>Vrstvy + semafor</h3><p>LIVE / STUB / FALLBACK badge u každé vrstvy. Loud disclaimery CZ.</p></div>
+  <div class="card"><div class="num">03</div><h3>PDF v prohlížeči</h3><p>Stažení HTML/PDF reportu. CLI zůstává jen pro backend/dev.</p></div>
+</div>
+
+<div class="squiggle"></div>
+<h2 class="section-title">Funkce</h2>
+<div class="grid-3">
+  <div class="card"><h3>Semafor rizik</h3><p>Povodně, radon, poddolování, sesuvy, zoning — přehledně na jedné stránce.</p></div>
+  <div class="card"><h3>Progress + chyby</h3><p>Jasné kroky generování a přátelské chybové stavy při neúplném vstupu.</p></div>
+  <div class="card"><h3>Demo parcela</h3><p>RÚIAN <code>{{ demo_ruian }}</code> · {{ demo_ku }} · {{ demo_parcel }}</p></div>
 </div>
 
 <div class="warn">
@@ -35,13 +54,11 @@
   Povodně, radon a zoning jsou orientační — viz disclaimery v reportu.
 </div>
 
-<div class="box">
-  <h2>Demo parcela</h2>
-  <p class="hint">
-    RÚIAN <code>{{ demo_ruian }}</code> · {{ demo_ku }} · {{ demo_parcel }}
-  </p>
-  <p style="margin-top:12px">
-    <a class="btn" href="/app">Otevřít formulář</a>
-  </p>
+<div class="cta-band">
+  <div>
+    <h2>Začněte s demo parcelou</h2>
+    <p>Bez instalace. Výsledek za pár sekund.</p>
+  </div>
+  <a class="btn" href="/app">Otevřít formulář →</a>
 </div>
 {% endblock %}

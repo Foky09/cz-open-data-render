@@ -1,14 +1,14 @@
 {% extends "base.html" %}
-{% block title %}Sign up — WasteGate{% endblock %}
+{% block title %}Registrace — WasteGate{% endblock %}
 {% block content %}
 <section class="card narrow">
-  <h1>Sign up</h1>
+  <h1>Registrace</h1>
   {% if error %}<p class="err">{{ error }}</p>{% endif %}
   <form method="post" action="/signup">
-    <label>Email <input type="email" name="email" required/></label>
-    <label>Password <input type="password" name="password" required minlength="6"/></label>
-    <button type="submit">Create account</button>
+    <label>E-mail <input type="email" name="email" required/></label>
+    <label>Heslo (min. 6) <input type="password" name="password" minlength="6" required/></label>
+    <p style="margin-top:16px"><button type="submit">Vytvořit účet</button></p>
   </form>
-  <p class="muted"><a href="/login">Log in</a></p>
+  <p class="muted"><a href="/login">Už máte účet?</a> · <a href="/">Landing</a></p>
 </section>
 {% endblock %}

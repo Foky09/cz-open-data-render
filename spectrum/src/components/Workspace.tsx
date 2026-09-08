@@ -24,6 +24,32 @@ function downloadBlob(filename: string, content: string, mime: string) {
   URL.revokeObjectURL(url);
 }
 
+function UploadIcon() {
+  return (
+    <svg className="dropzone-icon" viewBox="0 0 48 48" fill="none" aria-hidden>
+      <rect x="6" y="8" width="36" height="32" rx="8" stroke="currentColor" strokeWidth="2.5" />
+      <path
+        d="M24 30V16M24 16l-7 7M24 16l7 7"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function EmptyIllu() {
+  return (
+    <svg className="empty-illu" viewBox="0 0 64 64" fill="none" aria-hidden>
+      <rect x="8" y="12" width="48" height="40" rx="10" fill="#CCFBF1" stroke="#0D9488" strokeWidth="2.5" />
+      <path d="M20 28h24M20 36h16" stroke="#0D9488" strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="48" cy="16" r="10" fill="#FEF3C7" stroke="#1C1917" strokeWidth="2" />
+      <path d="M48 12v8M44 16h8" stroke="#1C1917" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function StationTable({ rows, empty }: { rows: StationRow[]; empty?: string }) {
   if (!rows.length) {
     return <p className="muted empty-hint">{empty ?? "Žádné stanice v tomto bucketu."}</p>;
@@ -191,9 +217,9 @@ export default function Workspace() {
 
       <div className="page-head">
         <div>
-          <h1 style={{ marginBottom: "0.35rem" }}>Pracovní plocha</h1>
+          <h1>Pracovní plocha</h1>
           <p className="muted" style={{ marginTop: 0, marginBottom: 0 }}>
-            Upload CSV/XLSX → kalendář obnov a actionable alerty.{" "}
+            Nahrajte export → bucket kalendář a alerty k obnově.{" "}
             <span className="badge badge-warn">bez auto-prodloužení</span>
           </p>
         </div>
@@ -230,10 +256,11 @@ export default function Workspace() {
           </>
         ) : (
           <>
+            <UploadIcon />
             <strong>Přetáhněte CSV / XLSX sem</strong>
             <p>
               nebo klikněte pro výběr · povinný sloupec <code>valid_to</code> (unix
-              nebo ISO)
+              nebo ISO, i smíšeně)
             </p>
           </>
         )}
@@ -288,6 +315,18 @@ export default function Workspace() {
 
       {payload && (
         <>
+          <div className="section-title" style={{ marginTop: "0.5rem" }}>
+            <h2>Bucket kalendář</h2>
+            <span className="muted">klikněte na kartu → skok na tabulku</span>
+          </div>
+          <div className="bucket-calendar-hint" aria-hidden>
+            {BUCKET_ORDER.map((b) => (
+              <span key={b} className={`bucket-tag ${b}`}>
+                {BUCKET_LABELS_CS[b]}
+              </span>
+            ))}
+          </div>
+
           <div className="summary summary-sticky" aria-label="Souhrn bucketů">
             {BUCKET_ORDER.map((b) => (
               <a key={b} href={`#bucket-${b}`} className={`summary-item ${b}`}>
@@ -351,7 +390,7 @@ export default function Workspace() {
                   {BUCKET_LABELS_CS[b]}{" "}
                   <span className="muted">({BUCKET_LABELS[b]})</span>
                 </h2>
-                <span className="muted">{byBucket[b].length}</span>
+                <span className="muted">{byBucket[b].length} stanic</span>
               </div>
               <div className="card">
                 <StationTable rows={byBucket[b]} />
@@ -369,21 +408,35 @@ export default function Workspace() {
 
       {!payload && hydrated && (
         <div className="card empty-state" style={{ marginTop: "1rem" }}>
-          <h3>Jak začít</h3>
+          <EmptyIllu />
+          <h3>Zatím tu nic není — pojďme na to</h3>
           <ol>
             <li>
               Nahrajte export stanic z ČTÚ (<strong>CSV / XLSX</strong>) se sloupcem{" "}
               <code>valid_to</code>, nebo klikněte „Načíst ukázku“.
             </li>
             <li>
-              Prohlédněte bucket kalendář a sekci <strong>K obnově</strong> (overdue ∪
-              ≤30).
+              Prohlédněte <strong>bucket kalendář</strong> nahoře a sekci{" "}
+              <strong>K obnově</strong> (overdue ∪ ≤30).
             </li>
             <li>
               Exportujte CSV/JSON pro další workflow —{" "}
               <strong>bez auto-prodloužení</strong>.
             </li>
           </ol>
+          <div className="cta-row" style={{ marginBottom: "1rem" }}>
+            <button type="button" className="btn" onClick={onSample} disabled={busy}>
+              Načíst ukázková data
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => inputRef.current?.click()}
+              disabled={busy}
+            >
+              Vybrat soubor
+            </button>
+          </div>
           <p className="muted" style={{ marginBottom: 0 }}>
             Tip: datumy můžou být smíšené (unix i ISO <code>YYYY-MM-DD</code>). Live
             sync ČTÚ API přijde později — zatím{" "}
