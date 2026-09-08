@@ -10,9 +10,9 @@ import {
   BucketId,
   StationRow,
   stationsToCsv,
-} from "@/lib/domain";
-import { loadSampleCsv, parseUploadedFile, rowsToAlerts } from "@/lib/parseFile";
-import { loadResult, saveResult, clearResult } from "@/lib/storage";
+} from "../lib/domain";
+import { loadSampleCsv, parseUploadedFile, rowsToAlerts } from "../lib/parseFile";
+import { loadResult, saveResult, clearResult } from "../lib/storage";
 
 function downloadBlob(filename: string, content: string, mime: string) {
   const blob = new Blob([content], { type: mime });

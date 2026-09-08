@@ -1,5 +1,5 @@
 import Link from "next/link";
-import ConnectPanel from "@/components/ConnectPanel";
+import ConnectPanel from "../../components/ConnectPanel";
 
 export default function SettingsPage() {
   return (
