@@ -6,9 +6,9 @@ export default function SettingsPage() {
     <main className="container">
       <div className="page-head">
         <div>
-          <h1>Nastavení / Připojení ČTÚ</h1>
+          <h1>Připojení ČTÚ (připravujeme)</h1>
           <p className="muted" style={{ marginTop: 0 }}>
-            Stub pro budoucí live sync.{" "}
+            Teď funguje nahrání souboru. Přímé stažení ze ČTÚ přidáme později — obnovu vždy děláte vy v portálu ČTÚ.{" "}
             <span className="badge badge-warn">bez auto-prodloužení</span>
           </p>
         </div>
@@ -18,11 +18,9 @@ export default function SettingsPage() {
       </div>
 
       <section className="card">
-        <h2>ČTÚ RLAN účet</h2>
+        <h2>ČTÚ účet</h2>
         <p className="muted">
-          Až bude sync hotový, stáhneme stanice přímo z API místo uploadu. Abstrakce{" "}
-          <code>RegulatorConnector</code> zůstává — další země (DE / AT / IT) se připojí
-          stejně.
+          Až bude sync hotový, stáhneme stanice přímo ze ČTÚ místo uploadu.
         </p>
         <ConnectPanel />
       </section>
@@ -30,38 +28,33 @@ export default function SettingsPage() {
       <section className="card">
         <h2>Co funguje teď</h2>
         <ul className="muted" style={{ marginBottom: 0 }}>
-          <li>Upload CSV / XLSX → bucket kalendář + alerty k obnově</li>
-          <li>Datumy: unix i ISO (i smíšeně v jednom souboru)</li>
+          <li>Upload CSV / Excel → kalendář + stanice k obnově</li>
           <li>
             <strong>Bez auto-prodloužení</strong> — obnovu děláte vy v portálu ČTÚ
-          </li>
-          <li>
-            Data zůstávají v prohlížeči (<code>localStorage</code>)
           </li>
         </ul>
       </section>
 
       <section className="card">
-        <h2>Roadmapa připojení</h2>
+        <h2>Roadmapa</h2>
         <div className="grid-2">
           <div>
             <span className="badge">teď</span>
             <p className="muted" style={{ margin: "0.5rem 0 0" }}>
-              Upload-only workflow, dry-run formulář, doménový kalendář Europe/Prague.
+              Nahrání souboru a kalendář obnov.
             </p>
           </div>
           <div>
             <span className="badge badge-warn">brzy</span>
             <p className="muted" style={{ margin: "0.5rem 0 0" }}>
-              Live access-token sync na rlantest / rlan.ctu.gov.cz — pořád bez
-              auto-prodloužení.
+              Přímé stažení ze ČTÚ — pořád bez auto-prodloužení.
             </p>
           </div>
         </div>
       </section>
 
       <p className="footer-note">
-        SpectrumDeadline MVP · CZ-first · EN secondary · No auto-renew
+        SpectrumDeadline · bez auto-prodloužení
       </p>
     </main>
   );

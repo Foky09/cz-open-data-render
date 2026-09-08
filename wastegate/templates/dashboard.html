@@ -4,7 +4,7 @@
 <section class="card">
   <div class="row">
     <h1>Status partnerů</h1>
-    <form method="post" action="/alerts/run"><button type="submit">Poslat status e-mail</button></form>
+    <form method="post" action="/alerts/run"><button type="submit">Poslat zkušební e-mail</button></form>
   </div>
   <div class="kpi-row">
     <div class="kpi"><div class="v">{{ rows|length }}</div><div class="l">Na watchlistu</div></div>
@@ -13,7 +13,7 @@
   {% if rows %}
   <table>
     <thead>
-      <tr><th>Země</th><th>IČZ / ID</th><th>Label</th><th>Status</th><th>IČO provozovatele</th><th>Kódy</th><th>Změna</th></tr>
+      <tr><th>Země</th><th>IČZ / ID</th><th>Název</th><th>Status</th><th>IČO provozovatele</th><th>Kódy</th><th>Změna</th></tr>
     </thead>
     <tbody>
       {% for r in rows %}
@@ -23,19 +23,19 @@
         <td>{{ r.label }}</td>
         <td>
           {% set st = (r.status or '')|lower %}
-          <span class="pill {% if 'aktiv' in st or st == 'active' %}ok{% elif 'not_found' in st or 'neaktiv' in st or st == 'missing' %}bad{% else %}warn{% endif %}">{{ r.status }}</span>
+          <span class="pill {% if 'aktiv' in st or st == 'active' %}ok{% elif 'not_found' in st or 'neaktiv' in st or st == 'missing' or 'nenalez' in st or 'ukonc' in st %}bad{% else %}warn{% endif %}">{{ r.status|status_cs }}</span>
         </td>
         <td>{{ r.operatorIco or "—" }}</td>
         <td>{{ r.wasteCodeCount }}</td>
-        <td class="muted">{{ r.changeSummary or "—" }}</td>
+        <td class="muted">{{ r.changeSummary|change_cs }}</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
   {% else %}
   <div class="empty">
-    <strong>Watchlist je prázdný</strong>
-    <p>Přidejte první IČZ na stránce <a href="/watchlist">Watchlist</a>.</p>
+    <strong>Zatím žádní partneři</strong>
+    <p>Přidejte první IČZ — budeme hlídat, jestli zůstane aktivní. Začněte na stránce <a href="/watchlist">Watchlist</a>.</p>
   </div>
   {% endif %}
 </section>

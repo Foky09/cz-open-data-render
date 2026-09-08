@@ -147,11 +147,11 @@
       <button type="button" data-tab="leads" class="active">Leady</button>
       <button type="button" data-tab="digest">Denní digest</button>
       <button type="button" data-tab="alerts">Alerty &amp; nastavení</button>
-      <button type="button" data-tab="health">Stav feedů</button>
+      <button type="button" data-tab="health">Stav zdrojů</button>
     </nav>
     <div class="userbar">
       <span class="meta" id="userEmail"></span>
-      <button type="button" class="btn secondary" id="btnRefresh" style="padding:.35rem .65rem;font-size:.8rem" title="Vynutit obnovení feedů (cooldown 60 s)">Obnovit</button>
+      <button type="button" class="btn secondary" id="btnRefresh" style="padding:.35rem .65rem;font-size:.8rem" title="Obnovit zdroje">Obnovit</button>
       <button type="button" class="btn secondary" id="btnLogout" style="padding:.35rem .65rem;font-size:.8rem">Odhlásit</button>
     </div>
   </header>
@@ -161,7 +161,7 @@
       <section>
         <h2>Leady <span class="badge" id="leadCount">—</span></h2>
         <div class="filters">
-          <label class="field">Jistota
+          <label class="field">Pravděpodobnost
             <select id="fConfidence">
               <option value="high,medium" selected>vysoká + střední</option>
               <option value="high">jen vysoká</option>
@@ -189,8 +189,8 @@
         <div class="stats" id="leadStats"></div>
         <div id="leadsBody" class="lead-list"></div>
         <div id="leadsEmpty" class="empty-state" hidden>
-          <strong>Žádné leady</strong>
-          <p>Pro zvolené filtry nemáme žádné stavební / záměr leady. Zkuste rozšířit jistotu, obec, query nebo datum — nebo počkejte na další obnovení cache.</p>
+          <strong>Žádné stavební záměry</strong>
+          <p>Uvolněte filtr obce, pravděpodobnosti nebo data. Nová oznámení dorazí s dalším denním během.</p>
         </div>
       </section>
     </div>
@@ -205,7 +205,7 @@
               <option value="day">podle dne</option>
             </select>
           </label>
-          <label class="field">Jistota
+          <label class="field">Pravděpodobnost
             <select id="dConfidence">
               <option value="high,medium" selected>vysoká + střední</option>
               <option value="high">jen vysoká</option>
@@ -217,7 +217,7 @@
         </div>
         <div class="stats" id="digestMeta"></div>
         <div id="digestBody">
-          <div class="empty-state"><strong>Načítám digest…</strong><p>Čekám na data z cache / feedů.</p></div>
+          <div class="empty-state"><strong>Načítám denní přehled…</strong><p>Chvilku strpení.</p></div>
         </div>
       </section>
     </div>
@@ -226,16 +226,16 @@
       <section>
         <h2>Alerty <span class="badge high">nastavení · 24 h</span></h2>
         <div id="alertsBody">
-          <div class="empty-state"><strong>Načítám…</strong><p>Kontroluji alerty dle uložených preferencí.</p></div>
+          <div class="empty-state"><strong>Načítám…</strong><p>Kontroluji upozornění podle vašich nastavení…</p></div>
         </div>
       </section>
       <section>
         <h2>Nastavení alertů</h2>
-        <p class="muted" style="margin-top:0">Uloženo v SQLite na serveru (dle přihlášeného e-mailu). Pole e-mail je stub — neodesílá zprávy.</p>
+        <p class="muted" style="margin-top:0">Uloženo k vašemu účtu. E-mailové odesílání v demu neběží — uložíte si jen preference.</p>
         <div class="prefs-grid">
           <label class="check"><input type="checkbox" id="pEnabled" checked /> Alerty zapnuté</label>
-          <label class="check"><input type="checkbox" id="pHighOnly" checked /> Jen vysoká jistota</label>
-          <label class="field">E-mail (stub)
+          <label class="check"><input type="checkbox" id="pHighOnly" checked /> Jen vysoká pravděpodobnost</label>
+          <label class="field">E-mail
             <input type="email" id="pEmail" placeholder="vy@firma.cz" />
           </label>
           <div>
@@ -252,27 +252,25 @@
 
     <div class="panel" id="tab-health">
       <section>
-        <h2>Stav feedů</h2>
-        <p class="muted" style="margin-top:0">Poskytovatel: CZ OFN (živý). AT / DE / IT jsou připravené stuby pro pozdější napojení.</p>
+        <h2>Stav zdrojů</h2>
+        <p class="muted" style="margin-top:0">Živá data z JMK úředních desek. Další země přidáme později.</p>
         <div style="overflow-x:auto">
           <table>
             <thead>
-              <tr><th>Feed</th><th>HTTP</th><th>Položky</th><th>Stav</th><th>Poznámka</th></tr>
+              <tr><th>Zdroj</th><th>HTTP</th><th>Položky</th><th>Stav</th><th>Poznámka</th></tr>
             </thead>
             <tbody id="feedsBody"></tbody>
           </table>
         </div>
         <div id="feedsEmpty" class="empty-state" hidden style="margin-top:1rem">
-          <strong>Zatím žádná data o feedech</strong>
-          <p>První načtení ještě běží, nebo cache je prázdná. Zkuste Obnovit.</p>
+          <strong>Zdroje se ještě načítají</strong>
+          <p>Zkuste Obnovit.</p>
         </div>
       </section>
     </div>
 
     <footer id="appFooter">
-      Zdroje: OFN JSON-LD (NKOD). Brno CC BY 4.0 (MMB). Cache 20 min. Bez eDesky scrape.
-      Soft auto-refresh UI: každých <span id="softRefreshLabel">3</span> min.
-      API: <code>/api/leads</code> · <code>/api/leads.csv</code> · <code>/api/digest</code>
+      JMK úřední desky · Brno CC BY 4.0 (MMB). Obnova UI každých <span id="softRefreshLabel">3</span> min.
     </footer>
   </main>
 
@@ -297,7 +295,7 @@
 
     function confBadge(c) {
       const cls = c === "high" ? "high" : c === "medium" ? "medium" : "";
-      return `<span class="badge ${cls}" title="jistota">${escapeHtml(confLabel(c))}</span>`;
+      return `<span class="badge ${cls}" title="pravděpodobnost">${escapeHtml(confLabel(c))}</span>`;
     }
 
     function muniChip(name) {
@@ -334,8 +332,8 @@
       const softMin = Math.round((meta.ui_soft_refresh_s || softRefreshMs / 1000) / 60);
       const rewarmMin = Math.round((meta.rewarm_interval_s || 300) / 60);
       hint.textContent =
-        `stáří ${age}s / TTL ${ttl}s · ${meta.fresh ? "čerstvé" : "zastaralé"}` +
-        ` · UI soft-refresh ${softMin} min · server re-warm každých ${rewarmMin} min`;
+        (meta.fresh ? "aktuální" : "obnovuji…") +
+        ` · automatická obnova každých ${softMin} min`;
       if (meta.ui_soft_refresh_s) {
         softRefreshMs = meta.ui_soft_refresh_s * 1000;
         $("softRefreshLabel").textContent = String(softMin);
@@ -379,7 +377,7 @@
     });
     $("btnRefresh").addEventListener("click", async () => {
       $("btnRefresh").disabled = true;
-      $("cacheStamp").textContent = "Obnovuji feedy (sekvenčně)…";
+      $("cacheStamp").textContent = "Obnovuji zdroje…";
       $("cacheStamp").classList.add("stale");
       try { await api("/api/refresh", { method: "POST" }); } catch (_) {}
       await Promise.all([loadLeads(), loadFeeds(), loadAlerts()]);
@@ -474,13 +472,13 @@
       $("digestMeta").innerHTML =
         `<span><strong>${escapeHtml(d.title)}</strong> (${escapeHtml(d.digest_date)})</span>` +
         `<span>Vygenerováno: ${escapeHtml(d.generated_pt)}</span>` +
-        `<span>Feedy OK/fail: <strong>${d.feeds_ok}/${d.feeds_fail}</strong></span>` +
+        `<span>Zdroje OK/chyba: <strong>${d.feeds_ok}/${d.feeds_fail}</strong></span>` +
         `<span>Leady: <strong>${d.lead_count}</strong></span>`;
 
       if (!d.groups?.length) {
         $("digestBody").innerHTML = emptyHtml(
-          "Digest je prázdný",
-          "Pro zvolené filtry nejsou žádné leady. Uvolněte filtr jistoty nebo datum."
+          "Zatím tu nic není",
+          "Zkuste širší období nebo počkejte na dnešní běh."
         );
         return;
       }
@@ -516,7 +514,7 @@
         const st = s.ok ? `<span class="badge ok">OK</span>` : `<span class="badge fail">FAIL</span>`;
         const note = s.ok ? (s.tls_note || "") : (s.error || "").slice(0, 140);
         tr.innerHTML = `
-          <td>${escapeHtml(s.name)}<div class="muted"><a href="${escapeAttr(s.url)}" target="_blank" rel="noopener">feed</a></div></td>
+          <td>${escapeHtml(s.name)}<div class="muted"><a href="${escapeAttr(s.url)}" target="_blank" rel="noopener">zdroj</a></div></td>
           <td>${s.http == null ? "—" : s.http}</td>
           <td>${s.items ?? 0}</td>
           <td>${st}</td>
@@ -532,7 +530,7 @@
       if (!alerts.alerts?.length) {
         ab.innerHTML = emptyHtml(
           "Žádné alerty",
-          "Za posledních 24 h nic neodpovídá aktuálnímu nastavení (jistota / obce). Upravte preference níže."
+          "Za posledních 24 h nic neodpovídá aktuálnímu nastavení (pravděpodobnost / obce). Upravte preference níže."
         );
       } else {
         ab.innerHTML = alerts.alerts.map(A => `

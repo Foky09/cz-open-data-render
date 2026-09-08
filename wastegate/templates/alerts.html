@@ -4,21 +4,21 @@
 <section class="card">
   <div class="row">
     <h1>E-mailové alerty</h1>
-    <form method="post" action="/alerts/run"><button type="submit">Vygenerovat teď</button></form>
+    <form method="post" action="/alerts/run"><button type="submit">Poslat zkušební e-mail</button></form>
   </div>
   {% if alerts %}
   <ul class="list">
     {% for a in alerts %}
     <li>
       <a href="/alerts/{{ a.id }}"><strong>{{ a.subject }}</strong></a>
-      <span class="muted">{{ a.createdAt }} · <span class="pill">{{ a.kind }}</span> · {{ (a.partnerIds or [])|length }} partnerů</span>
+      <span class="muted">{{ a.createdAt }} · <span class="pill">{{ a.kind|alert_kind_cs }}</span> · {{ (a.partnerIds or [])|length }} partnerů</span>
     </li>
     {% endfor %}
   </ul>
   {% else %}
   <div class="empty">
-    <strong>Žádné alerty</strong>
-    <p>Klikněte na „Vygenerovat teď“ pro status e-mail z aktuálního watchlistu.</p>
+    <strong>Zatím žádné e-maily</strong>
+    <p>Až přibude partner nebo se změní status, připravíme náhled e-mailu tady.</p>
   </div>
   {% endif %}
 </section>

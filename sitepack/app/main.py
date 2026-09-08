@@ -89,7 +89,7 @@ def generate(
             "saas/app.html",
             _ctx(
                 request,
-                error="Doplňte katastrální území i parcelní číslo, nebo zadejte RÚIAN Id, případně nechte zapnutý Demo mode.",
+                error="Doplňte parcelní číslo a katastrální území — nebo zapněte ukázku.",
             ),
             status_code=400,
         )
@@ -136,7 +136,7 @@ def results(request: Request, stem: str):
         return templates.TemplateResponse(
             request,
             "saas/app.html",
-            _ctx(request, error="Pack nenalezen. Vygenerujte nový."),
+            _ctx(request, error="Rešerše nenalezena. Spusťte novou."),
             status_code=404,
         )
     from app.models import SitePack

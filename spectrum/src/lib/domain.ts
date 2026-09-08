@@ -296,7 +296,7 @@ export function parseCsvText(text: string): Record<string, unknown>[] {
   if (!headers.length) throw new Error("CSV nemá hlavičku");
   if (!headers.includes("valid_to")) {
     throw new Error(
-      "Chybí povinný sloupec valid_to. První řádek CSV musí obsahovat hlavičku valid_to (unix nebo ISO)."
+      "V souboru chybí datum konce platnosti. V exportu ČTÚ hledejte sloupec s koncem platnosti (někdy valid_to)."
     );
   }
   const rows: Record<string, unknown>[] = [];

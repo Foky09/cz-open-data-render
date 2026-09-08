@@ -78,7 +78,7 @@
     </div>
     <div class="top-links">
       <a href="/">← Landing</a>
-      <a href="#" id="btn-explainer">Metric v2.1</a>
+      <a href="#" id="btn-explainer">Jak počítáme skok</a>
     </div>
   </header>
   <main>
@@ -87,19 +87,19 @@
       <label>Hledat
         <input type="search" id="q" placeholder="název nebo IČO…" />
       </label>
-      <label>Segment
+      <label>Typ
         <select id="segment">
-          <option value="ÚSC" selected>ÚSC</option>
-          <option value="OSS">OSS</option>
-          <option value="ALL">Vše</option>
+          <option value="ÚSC" selected>Obec/úřad</option>
+          <option value="OSS">Státní org.</option>
+          <option value="ALL">Všechny</option>
         </select>
       </label>
-      <label>Flag
+      <label>Stav signálu
         <select id="flag">
-          <option value="clean" selected>v pořádku (default)</option>
-          <option value="new_entity">nová jednotka</option>
-          <option value="suspect_negative_prior">zkontrolovat</option>
-          <option value="ALL">Všechny flagy</option>
+          <option value="clean" selected>V pořádku</option>
+          <option value="new_entity">Nová jednotka</option>
+          <option value="suspect_negative_prior">Zkontrolovat</option>
+          <option value="ALL">Všechny</option>
         </select>
       </label>
       <button type="button" class="secondary" id="btn-clear">Reset filtrů</button>
@@ -108,26 +108,26 @@
       <table>
         <thead>
           <tr>
-            <th>#</th><th>Organizace</th><th>IČO</th><th>Seg</th>
-            <th>Prev</th><th>Curr</th><th>Δ Kč</th><th>Flag</th><th>MONITOR</th>
+            <th>#</th><th>Organizace</th><th>IČO</th><th>Typ</th>
+            <th>Minulé období</th><th>Aktuální období</th><th>Δ Kč</th><th>Stav signálu</th><th>MONITOR</th>
           </tr>
         </thead>
         <tbody id="tbody"></tbody>
       </table>
       <div class="empty" id="empty" hidden>
-        <strong>Žádní movers</strong>
-        Pro zvolené filtry nic neodpovídá — zkuste „Vše“ / jiné flagy / prázdné hledání.
+        <strong>Nic v tomto filtru</strong>
+        <p>Zkuste „Všechny“ signály, jiný typ organizace, nebo vymazat hledání.</p>
+        <p style="margin-top:.75rem"><button type="button" id="btn-show-all" class="secondary">Zobrazit všechny signály</button></p>
       </div>
     </div>
     <section class="panel" id="explainer" hidden>
-      <h2>Metric contract v2.1</h2>
+      <h2>Jak počítáme skok</h2>
       <ul>
-        <li>Δ SUM(ZU_ROZKZ) by orgId vs prior period — FinM ÚSC primary, FinOSS secondary</li>
-        <li>|Δ| ≥ 100 000 Kč</li>
-        <li><code>clean</code> = prior present AND prior rozpzm≥0 AND prior rozkz&gt;0</li>
-        <li><code>new_entity</code> = missing prior OR prior rozkz==0</li>
-        <li><code>suspect_negative_prior</code> = prior rozpzm&lt;0 OR prior rozkz&lt;0 (emit; never default lead)</li>
-        <li>Core types are source-agnostic; CZ MONITOR is an adapter. Future: AT / DE / IT</li>
+        <li>Srovnání ICT rozpočtů organizace mezi minulým a aktuálním obdobím (MONITOR).</li>
+        <li>Zobrazujeme jen změny |Δ| ≥ 100 000 Kč.</li>
+        <li><strong>V pořádku</strong> — minulé období je k dispozici a vypadá konzistentně.</li>
+        <li><strong>Nová jednotka</strong> — chybí minulé období, nebo bylo nulové.</li>
+        <li><strong>Zkontrolovat</strong> — minulé období obsahuje podezřelé / záporné hodnoty.</li>
       </ul>
     </section>
   </main>
@@ -135,11 +135,13 @@
     <p><strong>Zdroj dat:</strong> Ministerstvo financí ČR – MONITOR státní pokladny.</p>
     <p>MFČR produkt CapexPulse nepodporuje ani neschvaluje.</p>
     <p><a href="https://monitor.statnipokladna.gov.cz/datovy-katalog/licence" target="_blank" rel="noreferrer">Podmínky užití MONITOR</a></p>
-    <p class="soft">Signal to verify — not gospel. Data mají informativní povahu.</p>
+    <p class="soft">Data mají informativní povahu — ověřte si je v MONITOR.</p>
   </footer>
   <script>
     const fmt = (n) => new Intl.NumberFormat('cs-CZ', { maximumFractionDigits: 0 }).format(n || 0);
     const mon = (ico) => `https://monitor.statnipokladna.gov.cz/ucetni-jednotka/${ico}`;
+    const FLAG_LABEL = { clean: 'V pořádku', new_entity: 'Nová jednotka', suspect_negative_prior: 'Zkontrolovat' };
+    const SEG_LABEL = { 'ÚSC': 'Obec/úřad', 'OSS': 'Státní org.' };
     let payload = null;
 
     function filteredRows() {
@@ -166,9 +168,9 @@
       const cleanN = rows.filter(r => r.flag === 'clean').length;
       const posN = rows.filter(r => (r.delta || 0) > 0).length;
       document.getElementById('kpis').innerHTML = `
-        <div class="kpi"><div class="v">${rows.length}</div><div class="l">Movers</div></div>
+        <div class="kpi"><div class="v">${rows.length}</div><div class="l">Signály</div></div>
         <div class="kpi"><div class="v lime">${fmt(sumDelta)}</div><div class="l">Σ Δ Kč</div></div>
-        <div class="kpi"><div class="v">${cleanN}</div><div class="l">Clean</div></div>
+        <div class="kpi"><div class="v">${cleanN}</div><div class="l">V pořádku</div></div>
         <div class="kpi"><div class="v">${posN}</div><div class="l">Kladné Δ</div></div>
       `;
     }
@@ -183,11 +185,11 @@
           <td>${i+1}</td>
           <td>${r.orgName || r.name || ''}</td>
           <td><code>${r.orgId || r.ico}</code></td>
-          <td><span class="pill">${r.segment}</span></td>
+          <td><span class="pill">${SEG_LABEL[r.segment] || r.segment}</span></td>
           <td class="num">${fmt(r.prevAmount ?? r.prev)}</td>
           <td class="num">${fmt(r.currAmount ?? r.curr)}</td>
           <td class="num delta ${(r.delta>=0)?'pos':'neg'}">${fmt(r.delta)}</td>
-          <td><span class="flag flag-${r.flag}">${r.flag}</span></td>
+          <td><span class="flag flag-${r.flag}">${FLAG_LABEL[r.flag] || r.flag}</span></td>
           <td><a href="${mon(r.orgId || r.ico)}" target="_blank" rel="noreferrer">otevřít</a></td>
         </tr>`).join('');
       document.getElementById('empty').hidden = rows.length > 0;
@@ -215,7 +217,7 @@
         payload = data;
         const m = data.meta || {};
         document.getElementById('subtitle').textContent =
-          `Perioda ${m.period || ''} vs ${m.prevPeriod || ''} · položka ${m.budgetLineCode || '6125'} · metric ${m.metricContract || 'v2.1'}`;
+          `ICT rozpočty · tento běh · ${m.period || ''} vs ${m.prevPeriod || ''} · položka ${m.budgetLineCode || '6125'}`;
         render();
       })
       .catch(err => {

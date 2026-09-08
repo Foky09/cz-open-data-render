@@ -4,46 +4,49 @@
 <ul class="progress" aria-label="Průběh rešerše">
   <li class="current"><span>Krok 1</span>Identita parcely</li>
   <li><span>Krok 2</span>Vrstvy rizik</li>
-  <li><span>Krok 3</span>PDF / HTML report</li>
+  <li><span>Krok 3</span>PDF report</li>
 </ul>
 
 <h1 style="margin-top:0">Nová rešerše parcely</h1>
-<p style="color:var(--muted);margin-top:0">Zadejte RÚIAN Id <em>nebo</em> k.ú. + parcelní číslo. Prázdný formulář / demo = UKÁZKA (FALLBACK).</p>
+<p style="color:var(--muted);margin-top:0">Zadejte katastrální území + parcelní číslo (nebo kód parcely). Prázdný formulář spustí ukázku.</p>
 
 {% if error %}<div class="error" role="alert">{{ error }}</div>{% endif %}
 
 <div class="warn">
-  <strong>⚠ Bez dat o vlastnictví (KN)</strong>
-  Výstup je informativní feasibility snapshot. Nenahrazuje stanoviska úřadů ani měření na pozemku.
+  <strong>Bez údajů o vlastníkovi.</strong>
+  Orientační podklad — nenahrazuje stanoviska úřadů.
 </div>
 
 <div class="box">
   <form method="post" action="/generate" id="pack-form">
-    <label for="ruian_id">RÚIAN Id (preferováno)</label>
-    <input id="ruian_id" name="ruian_id" type="text" placeholder="např. {{ demo_ruian }}" value=""/>
-
-    <label for="ku">Katastrální území (kód / název)</label>
+    <label for="ku">Katastrální území</label>
     <input id="ku" name="ku" type="text" placeholder="např. {{ demo_ku }}"/>
 
     <label for="parcel_number">Parcelní číslo</label>
     <input id="parcel_number" name="parcel_number" type="text" placeholder="např. {{ demo_parcel }}"/>
 
+    <details style="margin:12px 0">
+      <summary style="cursor:pointer;font-weight:700;color:var(--muted)">Pokročilé: kód parcely</summary>
+      <label for="ruian_id" style="margin-top:10px">Kód parcely (RÚIAN)</label>
+      <input id="ruian_id" name="ruian_id" type="text" placeholder="např. {{ demo_ruian }}" value=""/>
+    </details>
+
     <label class="inline">
       <input type="checkbox" name="demo" value="1" checked/>
-      Demo mode (hardcoded UKÁZKA / FALLBACK vrstvy)
+      Použít ukázkovou parcelu
     </label>
     <label class="inline">
       <input type="checkbox" name="force_live_ruian" value="1"/>
-      Zkusit live RÚIAN probe (VDP — často selže; dokumentovaný hook)
+      Zkusit živá data parcely
     </label>
 
     <p style="margin-top:18px">
-      <button class="btn btn-lg" type="submit" id="submit-btn">Vygenerovat pack</button>
+      <button class="btn btn-lg" type="submit" id="submit-btn">Připravit rešerši</button>
     </p>
-    <p class="hint" id="busy-hint" hidden>Generuji pack — chvilku strpení, načítám vrstvy…</p>
+    <p class="hint" id="busy-hint" hidden>Připravuji semafor rizik…</p>
     <p class="hint">
-      Demo: RÚIAN <code>{{ demo_ruian }}</code> · {{ demo_ku }} · {{ demo_parcel }}
-      {% if user %}· přihlášen: {{ user.email }}{% else %}· <a href="/login">přihlášení</a> (stub){% endif %}
+      Ukázka: {{ demo_ku }} · {{ demo_parcel }}
+      {% if user %}· přihlášen: {{ user.email }}{% else %}· <a href="/login">přihlášení</a>{% endif %}
     </p>
   </form>
 </div>
@@ -57,14 +60,14 @@
   Q₁₀₀ / aktivní zóny jsou orientační — ověřte u vodoprávního úřadu.
 </div>
 <div class="info">
-  <strong>ℹ Zoning (light)</strong>
+  <strong>ℹ Územní plán (orientační)</strong>
   Nenahrazuje územní rozhodnutí ani závazné stanovisko.
 </div>
 <script>
   document.getElementById("pack-form").addEventListener("submit", function () {
     var btn = document.getElementById("submit-btn");
     btn.disabled = true;
-    btn.textContent = "Generuji…";
+    btn.textContent = "Připravuji…";
     document.getElementById("busy-hint").hidden = false;
   });
 </script>

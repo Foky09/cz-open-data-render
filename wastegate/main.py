@@ -36,6 +36,54 @@ app.mount("/static", StaticFiles(directory=str(ROOT / "static")), name="static")
 templates = Jinja2Templates(directory=str(ROOT / "templates"))
 templates.env.globals["FOOTER"] = FOOTER
 
+def kind_cs(kind: str | None) -> str:
+    k = (kind or "").lower()
+    return {"facility": "Zařízení", "trader": "Obchodník", "zarizeni": "Zařízení", "obchodnik": "Obchodník"}.get(k, kind or "—")
+
+
+def status_cs(status: str | None) -> str:
+    s = (status or "").strip().lower()
+    mapping = {
+        "aktivni": "aktivní",
+        "active": "aktivní",
+        "ukonceno": "ukončeno",
+        "ukoncen": "ukončeno",
+        "not_found": "nenalezeno",
+        "missing": "nenalezeno",
+        "unknown": "neznámý",
+        "nenalezeno": "nenalezeno",
+        "aktivní": "aktivní",
+        "ukončeno": "ukončeno",
+    }
+    return mapping.get(s, status or "—")
+
+
+def change_cs(summary: str | None) -> str:
+    s = (summary or "").strip().lower()
+    mapping = {
+        "baseline": "Výchozí stav",
+        "missing in snapshot": "nenalezeno",
+        "status change": "Změna statusu",
+        "no change": "Bez změny",
+        "unchanged": "Bez změny",
+    }
+    return mapping.get(s, summary or "—")
+
+
+def alert_kind_cs(kind: str | None) -> str:
+    k = (kind or "").lower()
+    return {
+        "baseline": "Výchozí přehled",
+        "manual": "Výchozí přehled",
+        "status_change": "Změna statusu",
+        "diff": "Změna statusu",
+    }.get(k, kind or "—")
+
+templates.env.filters["kind_cs"] = kind_cs
+templates.env.filters["status_cs"] = status_cs
+templates.env.filters["change_cs"] = change_cs
+templates.env.filters["alert_kind_cs"] = alert_kind_cs
+
 
 def now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -121,7 +169,7 @@ def lookup_statuses(local_ids: list[str], country: str = "CZ") -> dict[str, dict
                 "wasteCodesSample": codes[:5],
                 "exportDate": row.get("export_date"),
                 "lastChange": row.get("export_date"),
-                "changeSummary": "baseline",
+                "changeSummary": "Výchozí stav",
             }
             if len(out) >= len(wanted):
                 break
@@ -171,22 +219,22 @@ def ensure_seeded() -> dict[str, Any]:
                 "wasteCodesSample": [],
                 "exportDate": None,
                 "lastChange": None,
-                "changeSummary": "missing in snapshot",
+                "changeSummary": "nenalezeno",
             })
     store["statuses"] = statuses
-    subject = "WasteGate: baseline watchlist (2026-09-08)"
+    subject = "WasteGate: stav partnerů (2026-09-08)"
     body_lines = [
         "WasteGate alert — 2026-09-08",
         "",
-        "Initial status report (baseline)",
+        "Výchozí přehled partnerů",
         "",
     ]
     for item in items:
         st = next((x for x in statuses if x["localId"].upper() == item["localId"].upper()), None)
         body_lines.append(f"{item['localId']} — {item['label']}")
-        body_lines.append(f"Status: {st['status'] if st else 'unknown'}")
-        body_lines.append(f"Operator IČO: {(st or {}).get('operatorIco') or '—'}")
-        body_lines.append(f"Waste codes: {(st or {}).get('wasteCodeCount', 0)}")
+        body_lines.append(f"Status: {status_cs(st['status'] if st else 'unknown')}")
+        body_lines.append(f"IČO provozovatele: {(st or {}).get('operatorIco') or '—'}")
+        body_lines.append(f"Kódy odpadu: {(st or {}).get('wasteCodeCount', 0)}")
         body_lines.append("")
     body_lines.append("---")
     body_lines.append(FOOTER)
@@ -425,15 +473,14 @@ def alerts_run(request: Request):
             store["statuses"] = [s for s in store["statuses"] if s["localId"].upper() != iid] + [st]
         status_by = {s["localId"].upper(): s for s in store["statuses"]}
     date = datetime.now().strftime("%Y-%m-%d")
-    subject = f"WasteGate: {len(items)} partners on watchlist ({date})"
-    lines = [f"WasteGate alert — {date}", "", f"Partners watched: {len(items)}", ""]
+    subject = f"WasteGate: stav partnerů ({date})"
+    lines = [f"WasteGate — {date}", "", f"Partnerů na seznamu: {len(items)}", ""]
     for item in items:
         st = status_by.get(item["localId"].upper(), {})
         lines.append(f"{item['localId']} — {item.get('label') or item['localId']}")
-        lines.append(f"Country: {item.get('country', 'CZ')}")
-        lines.append(f"Status: {st.get('status', 'unknown')}")
-        lines.append(f"Operator IČO: {st.get('operatorIco') or '—'}")
-        lines.append(f"Waste codes: {st.get('wasteCodeCount', 0)}")
+        lines.append(f"Status: {status_cs(st.get('status', 'unknown'))}")
+        lines.append(f"IČO provozovatele: {st.get('operatorIco') or '—'}")
+        lines.append(f"Kódy odpadu: {st.get('wasteCodeCount', 0)}")
         lines.append("")
     lines.append("---")
     lines.append(FOOTER)

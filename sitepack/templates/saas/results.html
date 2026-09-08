@@ -4,7 +4,7 @@
 <ul class="progress" aria-label="Průběh rešerše">
   <li class="done"><span>Krok 1</span>Identita parcely</li>
   <li class="done"><span>Krok 2</span>Vrstvy rizik</li>
-  <li class="current"><span>Krok 3</span>PDF / HTML report</li>
+  <li class="current"><span>Krok 3</span>PDF report</li>
 </ul>
 
 <div class="meta-row">
@@ -12,18 +12,18 @@
   <span><strong>Režim:</strong> {{ pack.mode_label }}</span>
   <span><strong>Vygenerováno:</strong> {{ pack.generated_at }}</span>
   <span>
-    Badges:
-    <span class="badge-mode LIVE">LIVE {{ badges.LIVE }}</span>
-    <span class="badge-mode STUB">STUB {{ badges.STUB }}</span>
-    <span class="badge-mode FALLBACK">FALLBACK {{ badges.FALLBACK }}</span>
+    Stav vrstev:
+    <span class="badge-mode LIVE">Živá data {{ badges.LIVE }}</span>
+    <span class="badge-mode STUB">Orientační {{ badges.STUB }}</span>
+    <span class="badge-mode FALLBACK">Ukázka {{ badges.FALLBACK }}</span>
   </span>
 </div>
 
 <h1 style="margin:4px 0 8px">{{ pack.parcel.ku_name }} · {{ pack.parcel.parcel_number }}</h1>
 <p style="color:var(--muted);margin-top:0">
   RÚIAN {{ pack.parcel.ruian_id or "—" }}
-  · <span class="badge-mode {{ pack.parcel.ui_badge() }}">{{ pack.parcel.ui_badge() }}</span>
-  {% if pack.parcel.is_mock %}· UKÁZKA{% endif %}
+  · <span class="badge-mode {{ pack.parcel.ui_badge() }}">{{ pack.parcel.human_badge_cs() }}</span>
+  {% if pack.parcel.is_mock %}· Ukázka{% endif %}
 </p>
 
 <div class="actions-bar">
@@ -43,7 +43,7 @@
 {% endif %}
 
 <div class="warn">
-  <strong>⚠ Bez KN ownership</strong>
+  <strong>Bez údajů o vlastníkovi.</strong>
   {{ pack.no_ownership_note }}
 </div>
 
@@ -67,7 +67,7 @@
     <span class="pill {{ layer.light.value }}">
       <span class="dot"></span>
       {{ layer.title_cs }} · {{ layer.light.label_cs }}
-      <span class="badge-mode {{ layer.ui_badge() }}" style="margin-left:4px">{{ layer.ui_badge() }}</span>
+      <span class="badge-mode {{ layer.ui_badge() }}" style="margin-left:4px">{{ layer.human_badge_cs() }}</span>
     </span>
     {% endfor %}
   </div>
@@ -82,7 +82,7 @@
         <span class="pill {{ layer.light.value }}" style="padding:2px 8px;font-size:.75rem">
           <span class="dot" style="width:7px;height:7px"></span> {{ layer.light.label_cs }}
         </span>
-        <span class="badge-mode {{ layer.ui_badge() }}">{{ layer.ui_badge() }}</span>
+        <span class="badge-mode {{ layer.ui_badge() }}">{{ layer.human_badge_cs() }}</span>
       </span>
     </h3>
     <ul>

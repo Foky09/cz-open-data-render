@@ -59,14 +59,14 @@ function StationTable({ rows, empty }: { rows: StationRow[]; empty?: string }) {
       <table className="data">
         <thead>
           <tr>
-            <th>Callsign</th>
+            <th>Volací znak</th>
             <th>Název</th>
-            <th>Freq</th>
-            <th>valid_to</th>
-            <th>dní</th>
-            <th>protected_to</th>
-            <th>bucket</th>
-            <th>akce</th>
+            <th>Frekvence</th>
+            <th>Konec platnosti</th>
+            <th>Dní</th>
+            <th>Ochrana do</th>
+            <th>Horizont</th>
+            <th>Akce</th>
           </tr>
         </thead>
         <tbody>
@@ -252,15 +252,14 @@ export default function Workspace() {
           <>
             <div className="spinner" aria-hidden />
             <strong>{busyLabel}</strong>
-            <p>Počkejte, parsuji valid_to (unix / ISO)…</p>
+            <p>Načítám datum konce platnosti…</p>
           </>
         ) : (
           <>
             <UploadIcon />
-            <strong>Přetáhněte CSV / XLSX sem</strong>
+            <strong>Přetáhněte export stanic z ČTÚ</strong>
             <p>
-              nebo klikněte pro výběr · povinný sloupec <code>valid_to</code> (unix
-              nebo ISO, i smíšeně)
+              CSV nebo Excel. Potřebujeme sloupec s datem konce platnosti — obvykle z exportu portálu.
             </p>
           </>
         )}
@@ -276,7 +275,7 @@ export default function Workspace() {
 
       <div className="toolbar">
         <button type="button" className="btn" onClick={onSample} disabled={busy}>
-          Načíst ukázku
+          Načíst ukázková data
         </button>
         <button
           type="button"
@@ -378,7 +377,7 @@ export default function Workspace() {
             <div className={`card ${actionableCount ? "card-actionable" : ""}`}>
               <StationTable
                 rows={payload.actionable}
-                empty="Žádné stanice k obnově — v pohodě. Nic neprodloužíme automaticky."
+                empty="Nic k obnově v horizontu 30 dní. Když nahráte soubor, „obnovit teď“ se objeví tady."
               />
             </div>
           </section>
@@ -399,9 +398,8 @@ export default function Workspace() {
           ))}
 
           <p className="footer-note">
-            SpectrumDeadline <strong>neobnovuje</strong> licence automaticky (bez
-            auto-prodloužení). Obnovu proveďte v portálu ČTÚ. Výsledek je uložen v
-            localStorage prohlížeče.
+            SpectrumDeadline <strong>neobnovuje</strong> licence automaticky.
+            Obnovu vždy děláte vy v portálu ČTÚ.
           </p>
         </>
       )}
@@ -409,19 +407,19 @@ export default function Workspace() {
       {!payload && hydrated && (
         <div className="card empty-state" style={{ marginTop: "1rem" }}>
           <EmptyIllu />
-          <h3>Zatím tu nic není — pojďme na to</h3>
+          <h3>Zatím žádné stanice</h3>
+          <p className="muted">
+            Nahrajte export — nebo vyzkoušejte ukázku.
+          </p>
           <ol>
             <li>
-              Nahrajte export stanic z ČTÚ (<strong>CSV / XLSX</strong>) se sloupcem{" "}
-              <code>valid_to</code>, nebo klikněte „Načíst ukázku“.
+              Nahrajte export stanic z ČTÚ (<strong>CSV / Excel</strong>), nebo klikněte „Načíst ukázková data“.
             </li>
             <li>
-              Prohlédněte <strong>bucket kalendář</strong> nahoře a sekci{" "}
-              <strong>K obnově</strong> (overdue ∪ ≤30).
+              Prohlédněte kalendář nahoře a sekci <strong>K obnově</strong> (do 30 dní).
             </li>
             <li>
-              Exportujte CSV/JSON pro další workflow —{" "}
-              <strong>bez auto-prodloužení</strong>.
+              Exportujte CSV/JSON pro další práci — obnovu vždy děláte vy v portálu ČTÚ.
             </li>
           </ol>
           <div className="cta-row" style={{ marginBottom: "1rem" }}>
@@ -438,9 +436,8 @@ export default function Workspace() {
             </button>
           </div>
           <p className="muted" style={{ marginBottom: 0 }}>
-            Tip: datumy můžou být smíšené (unix i ISO <code>YYYY-MM-DD</code>). Live
-            sync ČTÚ API přijde později — zatím{" "}
-            <Link href="/settings">Nastavení / ČTÚ</Link> (stub).
+            Přímé stažení ze ČTÚ přidáme později — zatím{" "}
+            <Link href="/settings">Nastavení / ČTÚ</Link>.
           </p>
         </div>
       )}

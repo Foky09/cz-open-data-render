@@ -4,7 +4,7 @@
 <section class="card">
   <p><a href="/alerts">← Zpět na alerty</a></p>
   <h1>{{ alert.subject }}</h1>
-  <p class="muted">{{ alert.createdAt }} · <span class="pill">{{ alert.kind }}</span></p>
+  <p class="muted">{{ alert.createdAt }} · <span class="pill">{{ alert.kind|alert_kind_cs }}</span></p>
 
   {% if partners %}
   <h2 style="color:var(--ink)">Partneři v alertu</h2>
@@ -14,10 +14,10 @@
       {% for p in partners %}
       <tr>
         <td><code>{{ p.localId }}</code></td>
-        <td><span class="pill">{{ p.status }}</span></td>
+        <td><span class="pill">{{ p.status|status_cs }}</span></td>
         <td>{{ p.operatorIco or "—" }}</td>
         <td>{{ p.wasteCodeCount }}</td>
-        <td class="muted">{{ p.changeSummary or "—" }}</td>
+        <td class="muted">{{ p.changeSummary|change_cs }}</td>
       </tr>
       {% endfor %}
     </tbody>

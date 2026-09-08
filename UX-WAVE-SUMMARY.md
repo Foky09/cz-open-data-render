@@ -88,3 +88,18 @@ Applied Czech P0 landing copy (eyebrow / H1 / sub / CTAs / 3 benefits / 3 how-it
 | Spectrum | `spectrum/src/app/page.tsx` | Ukázat stanice k obnově → `/app` |
 
 Also: CapexPulse `index.html` flag select labels → v pořádku / nová jednotka / zkontrolovat. Mirrors synced (capexpulse/dashboard, deskaradar/app, sitepack/concierge, wastegate/app, spectrum/app). `next build` green; Python mains AST-OK; no git commit.
+
+## P1 in-app empty states & engineering labels
+Date: 2026-09-08 (PT). Source: `/workspace/ux-audit/p1-in-app-empty-states.md`.
+
+Applied paste-ready Czech empty states + kill-list jargon out of main UI (metric/flags, cache/query/Stub/OFN chrome, valid_to/settings stubs, FALLBACK/VDP, baseline/facility). Attributions, brand accents, healthz, auth kept. No git commit.
+
+| Order | App | Highlights |
+|-------|-----|------------|
+| 1 | CapexPulse | Czech flag/typ labels; Prev/Curr → období; empty „Nic v tomto filtru“ + CTA; methodology collapsed as „Jak počítáme skok“; metric/gospel off canvas |
+| 2 | DeskaRadar | Login bez Stub/OFN; empty leads/digest/feeds; Pravděpodobnost; Stav zdrojů; footer attribution only |
+| 3 | Spectrum | Dropzone ČTÚ export; settings „Připojení ČTÚ (připravujeme)“; Brzy fields; valid_to only in errors |
+| 4 | SitePack | Form help + ukázková parcela; human badges Živá/Orientační/Ukázka; Územní plán (orientační) |
+| 5 | WasteGate | baseline→Výchozí stav; facility/trader→Zařízení/Obchodník; empty watchlist/alerts; zkušební e-mail; aktivní/ukončeno |
+
+**Verify:** `python -m py_compile` on CapexPulse/DeskaRadar/SitePack/WasteGate mains — OK. Spectrum `next build` green (`/workspace/spectrum/app`). Mirrors synced: capexpulse/dashboard, deskaradar/app, sitepack/concierge, wastegate/app, spectrum/app.

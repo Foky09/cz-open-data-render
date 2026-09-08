@@ -37,7 +37,7 @@ export const ctuCzUploadConnector: RegulatorConnector = {
     const hasValidToColumn = rows.some((r) => "valid_to" in r);
     if (!hasValidToColumn) {
       throw new Error(
-        "Chybí povinný sloupec valid_to. Export z ČTÚ musí obsahovat hlavičku valid_to (unix nebo ISO datum)."
+        "V souboru chybí datum konce platnosti. V exportu ČTÚ hledejte sloupec s koncem platnosti (někdy valid_to)."
       );
     }
 
@@ -47,7 +47,7 @@ export const ctuCzUploadConnector: RegulatorConnector = {
       const i = idx + 1;
       if (emptyish(raw.valid_to)) {
         throw new Error(
-          `Řádek ${i}: chybí hodnota ve sloupci valid_to (povinný pro ČTÚ export).`
+          `Řádek ${i}: chybí datum konce platnosti.`
         );
       }
 
@@ -66,7 +66,7 @@ export const ctuCzUploadConnector: RegulatorConnector = {
 
       if (valid_to === null) {
         throw new Error(
-          `Řádek ${i}: valid_to nelze převést na datum (očekáván unix nebo ISO YYYY-MM-DD).`
+          `Řádek ${i}: datum konce platnosti nelze převést.`
         );
       }
 

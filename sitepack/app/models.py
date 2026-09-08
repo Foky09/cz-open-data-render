@@ -50,11 +50,15 @@ class DataMode(str, Enum):
     @property
     def label_cs(self) -> str:
         return {
-            "live": "živé napojení",
-            "stub": "stub / hook",
-            "demo": "ukázka (fallback)",
-            "fallback": "fallback",
+            "live": "Živá data",
+            "stub": "Orientační",
+            "demo": "Ukázka",
+            "fallback": "Orientační",
         }[self.value]
+
+    @property
+    def human_badge_cs(self) -> str:
+        return self.label_cs
 
 
 class LayerResult(BaseModel):
@@ -81,6 +85,10 @@ class LayerResult(BaseModel):
             return "FALLBACK"
         return self.mode.badge
 
+    def human_badge_cs(self) -> str:
+        b = self.ui_badge()
+        return {"LIVE": "Živá data", "STUB": "Orientační", "FALLBACK": "Ukázka"}.get(b, b)
+
 
 class ParcelIdentity(BaseModel):
     ruian_id: Optional[str] = None
@@ -106,6 +114,10 @@ class ParcelIdentity(BaseModel):
         if ss == "DEMO":
             return "FALLBACK"
         return self.mode.badge
+
+    def human_badge_cs(self) -> str:
+        b = self.ui_badge()
+        return {"LIVE": "Živá data", "STUB": "Orientační", "FALLBACK": "Ukázka"}.get(b, b)
 
 
 class PackRequest(BaseModel):

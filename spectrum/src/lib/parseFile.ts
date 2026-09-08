@@ -14,7 +14,7 @@ export async function parseUploadedFile(file: File): Promise<Record<string, unkn
   if (name.endsWith(".csv") || file.type === "text/csv" || file.type === "text/plain") {
     const text = await file.text();
     if (!text.trim()) {
-      throw new Error("CSV je prázdný. Očekávána hlavička s valid_to a alespoň jeden řádek.");
+      throw new Error("CSV je prázdný. Nahrajte export stanic z ČTÚ s alespoň jedním řádkem.");
     }
     return parseCsvText(text);
   }
@@ -55,7 +55,7 @@ export function parseXlsxBuffer(buf: ArrayBuffer): Record<string, unknown>[] {
   );
   if (!headers.some((h) => h === "valid_to")) {
     throw new Error(
-      "Chybí povinný sloupec valid_to v XLSX. První řádek musí být hlavička s valid_to."
+      "V souboru chybí datum konce platnosti. V exportu ČTÚ hledejte sloupec s koncem platnosti (někdy valid_to)."
     );
   }
   const rows: Record<string, unknown>[] = [];

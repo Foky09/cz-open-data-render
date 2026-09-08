@@ -67,7 +67,7 @@ class ZoningProvider:
             },
             source="ÚÚR mapový portál / evidence ÚP (NGÚP-light) · LIVE link",
             disclaimer_kind="info",
-            disclaimer_title="ℹ Zoning v1 — pouze light vrstva",
+            disclaimer_title="ℹ Územní plán (orientační)",
             disclaimer_body=(
                 "Tento výstup nenahrazuje územní rozhodnutí, územní souhlas ani závazné stanovisko. "
                 "Semafor „žlutá“ znamená: ověřte aktuální ÚP / změny ÚP a regulativy u příslušného "
@@ -96,7 +96,7 @@ class ZoningProvider:
                 },
                 source="NGÚP / ÚP obce · light vrstva",
                 disclaimer_kind="info",
-                disclaimer_title="ℹ Zoning v1 — pouze light vrstva",
+                disclaimer_title="ℹ Územní plán (orientační)",
                 disclaimer_body=(
                     "Tento výstup nenahrazuje územní rozhodnutí, územní souhlas ani závazné stanovisko."
                 ),
@@ -119,7 +119,7 @@ class ZoningProvider:
             },
             source="NGÚP (stub)",
             disclaimer_kind="info",
-            disclaimer_title="ℹ Zoning v1 — pouze light vrstva",
+            disclaimer_title="ℹ Územní plán (orientační)",
             disclaimer_body="Tento výstup nenahrazuje územní rozhodnutí ani závazné stanovisko.",
             is_mock=True,
             mode=DataMode.stub,
