@@ -1,0 +1,19 @@
+{% extends "saas/base.html" %}
+{% block title %}Registrace — SitePack Pro{% endblock %}
+{% block content %}
+<div class="box" style="max-width:420px;margin:0 auto">
+  <h2>Registrace</h2>
+  <p class="hint">Stub registrace — hesla v plaintext JSON (záměrně). Žádná produkční bezpečnost.</p>
+  {% if error %}<div class="error">{{ error }}</div>{% endif %}
+  <form method="post" action="/register">
+    <label for="name">Jméno</label>
+    <input id="name" name="name" type="text" placeholder="Jan Novák"/>
+    <label for="email">E-mail</label>
+    <input id="email" name="email" type="email" required/>
+    <label for="password">Heslo</label>
+    <input id="password" name="password" type="password" required minlength="3"/>
+    <p style="margin-top:16px"><button class="btn" type="submit">Vytvořit účet</button></p>
+  </form>
+  <p class="stub-note">Už máte účet? <a href="/login">Přihlášení</a></p>
+</div>
+{% endblock %}

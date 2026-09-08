@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SitePack Pro — {% if pack.is_example %}Ukázka{% else %}Pack{% endif %} | {{ pack.parcel.ku_name }} {{ pack.parcel.parcel_number }}</title>
+  <style>
+    :root {
+      --ink: #1a2332;
+      --muted: #5a6a7a;
+      --line: #d8e0e8;
+      --bg: #f7f9fb;
+      --card: #ffffff;
+      --brand: #0b5fff;
+      --brand-dark: #0847c7;
+      --green: #1a7f37;
+      --green-bg: #e6f6ea;
+      --yellow: #9a6700;
+      --yellow-bg: #fff8c5;
+      --red: #cf222e;
+      --red-bg: #ffebe9;
+      --warn: #9a3412;
+      --warn-bg: #fff7ed;
+      --warn-border: #fb923c;
+      --info: #1e40af;
+      --info-bg: #eff6ff;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      color: var(--ink);
+      background: #e8eef4;
+      font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      font-size: 10.5pt;
+      line-height: 1.45;
+    }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 12px auto;
+      background: var(--card);
+      padding: 14mm 14mm 12mm;
+      box-shadow: 0 2px 16px rgba(0,0,0,.08);
+      position: relative;
+    }
+
+    /* —— Header —— */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      border-bottom: 2px solid var(--brand);
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+    }
+    .logo-block .product {
+      font-size: 18pt;
+      font-weight: 800;
+      color: var(--brand);
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+    .logo-block .tagline {
+      font-size: 8.5pt;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .badge-example {
+      display: inline-block;
+      background: #7c2d12;
+      color: #fff;
+      font-size: 8pt;
+      font-weight: 700;
+      letter-spacing: .06em;
+      padding: 3px 8px;
+      border-radius: 3px;
+      text-transform: uppercase;
+    }
+    .meta-right {
+      text-align: right;
+      font-size: 8.5pt;
+      color: var(--muted);
+    }
+    .meta-right strong { color: var(--ink); display: block; font-size: 10pt; }
+
+    /* —— Parcel identity —— */
+    .parcel-grid {
+      display: grid;
+      grid-template-columns: 1fr 72mm;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .id-card {
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+    .id-card h1 {
+      margin: 0 0 8px;
+      font-size: 13pt;
+      font-weight: 700;
+    }
+    .id-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9.5pt;
+    }
+    .id-table th {
+      text-align: left;
+      color: var(--muted);
+      font-weight: 600;
+      width: 38%;
+      padding: 3px 0;
+      vertical-align: top;
+    }
+    .id-table td {
+      padding: 3px 0;
+      font-weight: 600;
+    }
+    .example-mark {
+      color: #9a3412;
+      font-size: 7.5pt;
+      font-weight: 700;
+      letter-spacing: .04em;
+    }
+
+    .map-ph {
+      border: 1px dashed #94a3b8;
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, #e2e8f0 25%, transparent 25%) -10px 0 / 20px 20px,
+        linear-gradient(225deg, #e2e8f0 25%, transparent 25%) -10px 0 / 20px 20px,
+        linear-gradient(45deg, #e2e8f0 25%, transparent 25%) 0 0 / 20px 20px,
+        linear-gradient(315deg, #e2e8f0 25%, #f1f5f9 25%) 0 0 / 20px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 48mm;
+      color: var(--muted);
+      text-align: center;
+      padding: 8px;
+    }
+    .map-ph .pin {
+      width: 28px; height: 28px;
+      border-radius: 50% 50% 50% 0;
+      background: var(--brand);
+      transform: rotate(-45deg);
+      margin-bottom: 8px;
+      opacity: .85;
+      position: relative;
+    }
+    .map-ph .pin::after {
+      content: "";
+      position: absolute;
+      width: 10px; height: 10px;
+      background: #fff;
+      border-radius: 50%;
+      top: 9px; left: 9px;
+    }
+    .map-ph strong { color: var(--ink); font-size: 9pt; }
+    .map-ph small { font-size: 7.5pt; display: block; margin-top: 4px; }
+
+    /* —— Traffic lights —— */
+    .section-title {
+      font-size: 10pt;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: var(--ink);
+      margin: 14px 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lights {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 8.5pt;
+      font-weight: 700;
+      border: 1px solid transparent;
+    }
+    .pill .dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .pill.green { background: var(--green-bg); color: var(--green); border-color: #a7e3b4; }
+    .pill.green .dot { background: var(--green); }
+    .pill.yellow { background: var(--yellow-bg); color: var(--yellow); border-color: #f0d060; }
+    .pill.yellow .dot { background: #eab308; }
+    .pill.red { background: var(--red-bg); color: var(--red); border-color: #f5b5b8; }
+    .pill.red .dot { background: var(--red); }
+    .pill .lbl { opacity: .85; font-weight: 600; }
+
+    /* —— Loud disclaimer banners —— */
+    .banner {
+      border-radius: 6px;
+      padding: 8px 10px;
+      margin: 8px 0;
+      font-size: 8.5pt;
+      line-height: 1.4;
+      border: 2px solid;
+    }
+    .banner strong {
+      display: block;
+      font-size: 8.5pt;
+      letter-spacing: .03em;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+    .banner.warn {
+      background: var(--warn-bg);
+      border-color: var(--warn-border);
+      color: var(--warn);
+    }
+    .banner.danger {
+      background: #fef2f2;
+      border-color: #f87171;
+      color: #991b1b;
+    }
+    .banner.info {
+      background: var(--info-bg);
+      border-color: #60a5fa;
+      color: var(--info);
+    }
+
+    /* —— Detail cards —— */
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+      background: #fff;
+      break-inside: avoid;
+    }
+    .card h3 {
+      margin: 0 0 4px;
+      font-size: 10pt;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .card p, .card li {
+      margin: 0;
+      font-size: 8.5pt;
+      color: var(--ink);
+    }
+    .card ul { margin: 4px 0 0; padding-left: 16px; }
+    .card .src {
+      margin-top: 6px;
+      font-size: 7.5pt;
+      color: var(--muted);
+    }
+    .card.full { grid-column: 1 / -1; }
+
+    table.geo {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8.5pt;
+      margin-top: 4px;
+    }
+    table.geo th, table.geo td {
+      border: 1px solid var(--line);
+      padding: 4px 6px;
+      text-align: left;
+    }
+    table.geo th {
+      background: var(--bg);
+      font-weight: 700;
+      color: var(--muted);
+      font-size: 7.5pt;
+      text-transform: uppercase;
+    }
+
+    /* —— Zoning / CTA / footer —— */
+    .zoning-box {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+      background: var(--bg);
+      margin-top: 4px;
+    }
+    .zoning-box a { color: var(--brand); font-weight: 600; }
+    .cta {
+      margin-top: 14px;
+      padding: 10px 12px;
+      background: linear-gradient(135deg, #0b5fff 0%, #0847c7 100%);
+      color: #fff;
+      border-radius: 8px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+    .cta h4 { margin: 0 0 2px; font-size: 11pt; }
+    .cta p { margin: 0; font-size: 8pt; opacity: .92; }
+    .cta-btns { display: flex; flex-direction: column; gap: 4px; }
+    .cta-btns span {
+      background: #fff;
+      color: var(--brand-dark);
+      font-size: 7.5pt;
+      font-weight: 800;
+      padding: 5px 10px;
+      border-radius: 4px;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .sources {
+      margin-top: 10px;
+      font-size: 7.5pt;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      padding-top: 6px;
+    }
+    .sources strong { color: var(--ink); }
+    .footer-legal {
+      margin-top: 8px;
+      padding: 8px 10px;
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 6px;
+      font-size: 8pt;
+      line-height: 1.4;
+    }
+    .footer-legal strong { color: #fff; }
+
+    .page-num {
+      position: absolute;
+      bottom: 8mm;
+      right: 14mm;
+      font-size: 8pt;
+      color: var(--muted);
+    }
+
+
+    .badge-mode {
+      display: inline-block;
+      font-size: 6.5pt;
+      font-weight: 800;
+      letter-spacing: .05em;
+      padding: 2px 5px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      vertical-align: middle;
+      margin-left: 4px;
+    }
+    .badge-mode.LIVE { background: #ccfbf1; color: #0f766e; }
+    .badge-mode.STUB { background: #f3f4f6; color: #6b7280; }
+    .badge-mode.FALLBACK { background: #ffedd5; color: #9a3412; }
+
+
+    .src-badge {
+      display: inline-block;
+      font-size: 7pt;
+      font-weight: 800;
+      letter-spacing: .05em;
+      padding: 1px 6px;
+      border-radius: 3px;
+      vertical-align: middle;
+      margin-left: 4px;
+    }
+    .src-badge.LIVE { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+    .src-badge.STUB { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+    .src-badge.FALLBACK { background: #ffedd5; color: #9a3412; border: 1px solid #fdba74; }
+    .src-badge.DEMO { background: #fae8ff; color: #86198f; border: 1px solid #e879f9; }
+    table.status {
+      width: 100%; border-collapse: collapse; font-size: 8pt; margin-top: 8px;
+    }
+    table.status th, table.status td {
+      border: 1px solid var(--line); padding: 4px 6px; text-align: left;
+    }
+    table.status th { background: var(--bg); font-size: 7.5pt; text-transform: uppercase; color: var(--muted); }
+
+    /* —— Print / A4 —— */
+    @page {
+      size: A4;
+      margin: 0;
+    }
+    @media print {
+      html, body { background: #fff; }
+      .page {
+        margin: 0;
+        box-shadow: none;
+        width: 210mm;
+        min-height: 297mm;
+        padding: 12mm 14mm 14mm;
+        page-break-after: always;
+      }
+      .page:last-child { page-break-after: auto; }
+      a { text-decoration: none; color: inherit; }
+      .cta-btns span { border: 1px solid #fff; }
+    }
+
+    @media screen {
+      body { padding: 8px 0 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <article class="page">
+    <header class="topbar">
+      <div class="logo-block">
+        <div class="product">SitePack Pro</div>
+        <div class="tagline">Parcelní rešerše pro developery · Feasibility snapshot</div>
+        {% if pack.is_example %}
+        <div style="margin-top:6px"><span class="badge-example">UKÁZKA / EXAMPLE — {{ pack.mode_label }}</span></div>
+        {% endif %}
+      </div>
+      <div class="meta-right">
+        <strong>SitePack Pro SaaS · {{ pack.country }}</strong>
+        Datum: {{ pack.generated_at }}<br />
+        Verze šablony: {{ pack.template_version }}<br />
+        <span class="example-mark">NEOBSAHUJE data o vlastnictví (KN)</span>
+      </div>
+    </header>
+
+    <div class="parcel-grid">
+      <div class="id-card">
+        <h1>Identita parcely <span class="example-mark">(RÚIAN)</span> <span class="src-badge {{ pack.parcel.source_status }}">{{ pack.parcel.source_status }}</span></h1>
+        <table class="id-table">
+          <tr><th>Katastrální území</th><td>{{ pack.parcel.ku_name }}{% if pack.parcel.is_mock %} <span class="example-mark">UKÁZKA</span>{% endif %}</td></tr>
+          <tr><th>Parcelní číslo</th><td>{{ pack.parcel.parcel_number }}{% if pack.parcel.is_mock %} <span class="example-mark">EXAMPLE</span>{% endif %}</td></tr>
+          <tr><th>RÚIAN Id</th><td>{{ pack.parcel.ruian_id or "—" }}{% if pack.parcel.is_mock %} <span class="example-mark">fiktivní</span>{% endif %}</td></tr>
+          <tr><th>Výměra</th><td>{% if pack.parcel.area_m2 is not none %}{{ "{:,.0f}".format(pack.parcel.area_m2).replace(",", " ") }} m²{% else %}—{% endif %}{% if pack.parcel.is_mock %} <span class="example-mark">UKÁZKA</span>{% endif %}</td></tr>
+          <tr><th>Typ parcely</th><td>{{ pack.parcel.parcel_type or "—" }}</td></tr>
+          <tr><th>Obec / okres</th><td>{{ pack.parcel.obec or "—" }} · {{ pack.parcel.okres or "—" }}</td></tr>
+        </table>
+        {% if pack.parcel.lookup_note %}
+        <p class="src" style="margin-top:8px">{{ pack.parcel.lookup_note }}</p>
+        {% endif %}
+      </div>
+      <div class="map-ph" role="img" aria-label="Placeholder mapy">
+        <div class="pin" aria-hidden="true"></div>
+        <strong>{{ pack.parcel.geometry_note }}</strong>
+        <small>Později: WMS/orto + obrys parcely<br />ČÚZK / RÚIAN · UKÁZKA</small>
+      </div>
+    </div>
+
+    <div class="section-title">Semafor rizik · Traffic lights</div>
+    <div class="lights" aria-label="Semafor">
+      <span class="pill {{ pack.layers.flood.light.value }}"><span class="dot"></span> Povodně · <span class="lbl">{{ pack.layers.flood.light.label_cs }}</span> <span class="badge-mode {{ pack.layers.flood.mode.badge }}">{{ pack.layers.flood.mode.badge }}</span></span>
+      <span class="pill {{ pack.layers.radon.light.value }}"><span class="dot"></span> Radon · <span class="lbl">{{ pack.layers.radon.light.label_cs }}</span> <span class="badge-mode {{ pack.layers.radon.mode.badge }}">{{ pack.layers.radon.mode.badge }}</span></span>
+      <span class="pill {{ pack.layers.poddolovani.light.value }}"><span class="dot"></span> Poddolování · <span class="lbl">{{ pack.layers.poddolovani.light.label_cs }}</span> <span class="badge-mode {{ pack.layers.poddolovani.mode.badge }}">{{ pack.layers.poddolovani.mode.badge }}</span></span>
+      <span class="pill {{ pack.layers.svahy.light.value }}"><span class="dot"></span> Sesuvy · <span class="lbl">{{ pack.layers.svahy.light.label_cs }}</span> <span class="badge-mode {{ pack.layers.svahy.mode.badge }}">{{ pack.layers.svahy.mode.badge }}</span></span>
+      <span class="pill {{ pack.layers.zoning.light.value }}"><span class="dot"></span> Územní plán · <span class="lbl">{{ pack.layers.zoning.light.label_cs }} (light)</span> <span class="badge-mode {{ pack.layers.zoning.mode.badge }}">{{ pack.layers.zoning.mode.badge }}</span></span>
+    </div>
+
+    <div class="cards">
+      <section class="card">
+        <h3>
+          Povodně
+          <span class="pill {{ pack.layers.flood.light.value }}" style="padding:2px 8px;font-size:7.5pt"><span class="dot" style="width:7px;height:7px"></span> {{ pack.layers.flood.light.label_cs }}</span>
+          <span class="badge-mode {{ pack.layers.flood.mode.badge }}">{{ pack.layers.flood.mode.badge }}</span>
+        </h3>
+        <ul>
+          {% for line in pack.layers.flood.summary_lines %}
+          <li>{{ line }}{% if pack.layers.flood.is_mock %} <span class="example-mark">UKÁZKA</span>{% endif %}</li>
+          {% endfor %}
+        </ul>
+        <p class="src">Zdroj: {{ pack.layers.flood.source }}</p>
+        {% if pack.layers.flood.disclaimer_body %}
+        <div class="banner {{ pack.layers.flood.disclaimer_kind or "warn" }}">
+          <strong>{{ pack.layers.flood.disclaimer_title }}</strong>
+          {{ pack.layers.flood.disclaimer_body }}
+        </div>
+        {% endif %}
+      </section>
+
+      <section class="card">
+        <h3>
+          Radon
+          <span class="pill {{ pack.layers.radon.light.value }}" style="padding:2px 8px;font-size:7.5pt"><span class="dot" style="width:7px;height:7px"></span> {{ pack.layers.radon.light.label_cs }}</span>
+          <span class="badge-mode {{ pack.layers.radon.mode.badge }}">{{ pack.layers.radon.mode.badge }}</span>
+        </h3>
+        <ul>
+          {% for line in pack.layers.radon.summary_lines %}
+          <li>{{ line }}{% if pack.layers.radon.is_mock %} <span class="example-mark">UKÁZKA</span>{% endif %}</li>
+          {% endfor %}
+        </ul>
+        <p class="src">Zdroj: {{ pack.layers.radon.source }}</p>
+        {% if pack.layers.radon.disclaimer_body %}
+        <div class="banner {{ pack.layers.radon.disclaimer_kind or "danger" }}">
+          <strong>{{ pack.layers.radon.disclaimer_title }}</strong>
+          {{ pack.layers.radon.disclaimer_body }}
+        </div>
+        {% endif %}
+      </section>
+
+      <section class="card full">
+        <h3>Geologie — poddolování &amp; svahové deformace</h3>
+        <table class="geo">
+          <thead>
+            <tr>
+              <th>Téma</th>
+              <th>Zásah</th>
+              <th>Detail</th>
+              <th>Zdroj</th>
+              <th>Semafor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Poddolování (ČGS)</td>
+              <td>{% if pack.layers.poddolovani.detail.get("hit") is sameas false %}Ne{% elif pack.layers.poddolovani.detail.get("hit") %}Ano{% else %}—{% endif %}</td>
+              <td>{{ pack.layers.poddolovani.summary_lines[1] if pack.layers.poddolovani.summary_lines|length > 1 else (pack.layers.poddolovani.summary_lines[0] if pack.layers.poddolovani.summary_lines else "—") }}</td>
+              <td><span class="src-badge {{ pack.layers.poddolovani.source_status }}">{{ pack.layers.poddolovani.source_status }}</span></td>
+              <td><span class="pill {{ pack.layers.poddolovani.light.value }}" style="padding:2px 8px;font-size:7pt"><span class="dot" style="width:7px;height:7px"></span> {{ pack.layers.poddolovani.light.label_cs }}</span></td>
+            </tr>
+            <tr>
+              <td>Svahové deformace</td>
+              <td>{% if pack.layers.svahy.detail.get("hit") %}Ano{% elif pack.layers.svahy.detail.get("hit") is sameas false %}Ne{% else %}—{% endif %}</td>
+              <td>{{ pack.layers.svahy.summary_lines[1] if pack.layers.svahy.summary_lines|length > 1 else (pack.layers.svahy.summary_lines[0] if pack.layers.svahy.summary_lines else "—") }}</td>
+              <td><span class="src-badge {{ pack.layers.svahy.source_status }}">{{ pack.layers.svahy.source_status }}</span></td>
+              <td><span class="pill {{ pack.layers.svahy.light.value }}" style="padding:2px 8px;font-size:7pt"><span class="dot" style="width:7px;height:7px"></span> {{ pack.layers.svahy.light.label_cs }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="src">Zdroj poddolování: {{ pack.layers.poddolovani.source }} · sesuvy: {{ pack.layers.svahy.source }}</p>
+      </section>
+    </div>
+
+    <div class="section-title">Územní plánování · Zoning (v1 light) <span class="src-badge {{ pack.layers.zoning.source_status }}">{{ pack.layers.zoning.source_status }}</span></div>
+    <div class="zoning-box">
+      <p style="margin:0 0 6px;font-size:9pt">
+        <strong>Orientační třída využití{% if pack.is_example %} (UKÁZKA){% endif %}:</strong> {{ pack.zoning_class or "—" }}
+        · odkaz na dokumentaci obce:
+        <a href="{{ pack.zoning_url }}" rel="noopener">{{ pack.zoning_url_label }}</a>
+        (placeholder odkaz — později přímý join na ÚAP/ÚP).
+      </p>
+      {% if pack.layers.zoning.disclaimer_body %}
+      <div class="banner {{ pack.layers.zoning.disclaimer_kind or "info" }}">
+        <strong>{{ pack.layers.zoning.disclaimer_title }}</strong>
+        {{ pack.layers.zoning.disclaimer_body }}
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="cta">
+      <div>
+        <h4>Chcete plný SitePack?</h4>
+        <p>Full pack · portfolio parcel · API napojení — bez dat o vlastnictví (KN). Kontaktujte nás pro produkční feed.</p>
+      </div>
+      <div class="cta-btns">
+        <span>Full pack</span>
+        <span>Portfolio</span>
+        <span>API</span>
+      </div>
+    </div>
+
+
+    <div class="section-title">Stav zdrojů · LIVE / STUB / FALLBACK</div>
+    <table class="status">
+      <thead><tr><th>Vrstva</th><th>Status</th><th>Mode</th><th>Blocker / poznámka</th></tr></thead>
+      <tbody>
+      {% for row in pack.layer_status_table %}
+        <tr>
+          <td>{{ row.layer }}</td>
+          <td><span class="src-badge {{ row.status }}">{{ row.status }}</span></td>
+          <td>{{ row.mode }}</td>
+          <td>{{ row.blocker or "—" }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="sources">
+      <strong>Zdroje (CC BY):</strong>
+      {{ pack.sources_blurb }}
+      {% if pack.is_example %}Všechny číselné údaje v tomto dokumentu jsou <strong>fiktivní ukázka</strong>.{% endif %}
+    </div>
+
+    <div class="footer-legal">
+      <strong>Informativní podklad.</strong>
+      Tento dokument nenahrazuje rozhodnutí správních úřadů ani geotechnický / radonový průzkum.
+      {{ pack.no_ownership_note }}
+      SitePack Pro — concierge MVP · šablona kompatibilní se sample.
+    </div>
+    <div class="page-num">1 / 1 · SitePack Pro {{ pack.mode_label }}</div>
+  </article>
+
+</body>
+</html>

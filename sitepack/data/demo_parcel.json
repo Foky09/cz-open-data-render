@@ -1,0 +1,15 @@
+{
+  "parcel": {
+    "ruian_id": "680123456",
+    "ku_code": "610952",
+    "ku_name": "Brno-město",
+    "parcel_number": "1234/5",
+    "area_m2": 2450,
+    "parcel_type": "Stavební parcela (orientačně)",
+    "obec": "Brno",
+    "okres": "Brno-město",
+    "geometry_wkt": "POLYGON((16.6058 49.1955, 16.6072 49.1955, 16.6072 49.1964, 16.6058 49.1964, 16.6058 49.1955))",
+    "geometry_note": "Demo polygon WGS84 · Brno (pro live PiP / WFS)"
+  },
+  "note": "UKÁZKA identita — fiktivní RÚIAN Id; geometrie slouží k live open-data joins"
+}

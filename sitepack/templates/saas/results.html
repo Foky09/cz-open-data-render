@@ -1,0 +1,103 @@
+{% extends "saas/base.html" %}
+{% block title %}Výsledky — {{ pack.parcel.ku_name }} {{ pack.parcel.parcel_number }}{% endblock %}
+{% block content %}
+<div class="meta-row">
+  <span><strong>Země:</strong> {{ pack.country }}</span>
+  <span><strong>Režim:</strong> {{ pack.mode_label }}</span>
+  <span><strong>Vygenerováno:</strong> {{ pack.generated_at }}</span>
+  <span>
+    Badges:
+    <span class="badge-mode LIVE">LIVE {{ badges.LIVE }}</span>
+    <span class="badge-mode STUB">STUB {{ badges.STUB }}</span>
+    <span class="badge-mode FALLBACK">FALLBACK {{ badges.FALLBACK }}</span>
+  </span>
+</div>
+
+<h1 style="margin:4px 0 8px">{{ pack.parcel.ku_name }} · {{ pack.parcel.parcel_number }}</h1>
+<p style="color:var(--muted);margin-top:0">
+  RÚIAN {{ pack.parcel.ruian_id or "—" }}
+  · <span class="badge-mode {{ pack.parcel.ui_badge() }}">{{ pack.parcel.ui_badge() }}</span>
+  {% if pack.parcel.is_mock %}· UKÁZKA{% endif %}
+</p>
+
+<div class="actions-bar">
+  {% if pdf_ready %}
+  <a class="btn" href="/files/{{ stem }}.pdf">Stáhnout PDF</a>
+  {% else %}
+  <span class="btn btn-secondary" style="opacity:.6;cursor:not-allowed">PDF není k dispozici</span>
+  {% endif %}
+  <a class="btn btn-secondary" href="/files/{{ stem }}.html" target="_blank">Otevřít HTML report</a>
+  <a class="btn btn-secondary" href="/app">Nová rešerše</a>
+</div>
+
+<div class="warn">
+  <strong>⚠ Bez KN ownership</strong>
+  {{ pack.no_ownership_note }}
+</div>
+
+<div class="box">
+  <h2>Identita parcely</h2>
+  <table class="id-table">
+    <tr><th>Katastrální území</th><td>{{ pack.parcel.ku_name }}</td></tr>
+    <tr><th>Parcelní číslo</th><td>{{ pack.parcel.parcel_number }}</td></tr>
+    <tr><th>RÚIAN Id</th><td>{{ pack.parcel.ruian_id or "—" }}</td></tr>
+    <tr><th>Výměra</th><td>{% if pack.parcel.area_m2 is not none %}{{ "{:,.0f}".format(pack.parcel.area_m2).replace(",", " ") }} m²{% else %}—{% endif %}</td></tr>
+    <tr><th>Typ</th><td>{{ pack.parcel.parcel_type or "—" }}</td></tr>
+    <tr><th>Obec / okres</th><td>{{ pack.parcel.obec or "—" }} · {{ pack.parcel.okres or "—" }}</td></tr>
+  </table>
+  {% if pack.parcel.lookup_note %}<p class="hint">{{ pack.parcel.lookup_note }}</p>{% endif %}
+</div>
+
+<div class="box">
+  <h2>Semafor rizik</h2>
+  <div class="lights">
+    {% for key, layer in pack.layers.items() %}
+    <span class="pill {{ layer.light.value }}">
+      <span class="dot"></span>
+      {{ layer.title_cs }} · {{ layer.light.label_cs }}
+      <span class="badge-mode {{ layer.ui_badge() }}" style="margin-left:4px">{{ layer.ui_badge() }}</span>
+    </span>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="layer-grid">
+  {% for key, layer in pack.layers.items() %}
+  <div class="card layer-card">
+    <h3>
+      <span>{{ layer.title_cs }}</span>
+      <span>
+        <span class="pill {{ layer.light.value }}" style="padding:2px 8px;font-size:.75rem">
+          <span class="dot" style="width:7px;height:7px"></span> {{ layer.light.label_cs }}
+        </span>
+        <span class="badge-mode {{ layer.ui_badge() }}">{{ layer.ui_badge() }}</span>
+      </span>
+    </h3>
+    <ul>
+      {% for line in layer.summary_lines %}
+      <li>{{ line }}</li>
+      {% endfor %}
+    </ul>
+    <p class="src">Zdroj: {{ layer.source }}</p>
+    {% if layer.disclaimer_body %}
+      {% if layer.disclaimer_kind == "danger" %}
+      <div class="danger"><strong>{{ layer.disclaimer_title }}</strong>{{ layer.disclaimer_body }}</div>
+      {% elif layer.disclaimer_kind == "info" %}
+      <div class="info"><strong>{{ layer.disclaimer_title }}</strong>{{ layer.disclaimer_body }}</div>
+      {% else %}
+      <div class="warn"><strong>{{ layer.disclaimer_title }}</strong>{{ layer.disclaimer_body }}</div>
+      {% endif %}
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+
+<div class="paths">
+  HTML: <code>{{ html_abs }}</code><br/>
+  {% if pdf_abs %}PDF: <code>{{ pdf_abs }}</code>{% endif %}
+</div>
+
+<div class="iframe-wrap">
+  <iframe src="/files/{{ stem }}.html" title="SitePack report"></iframe>
+</div>
+{% endblock %}

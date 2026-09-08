@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CapexPulse — ICT capex movers</title>
+  <style>
+    :root { --bg:#0f1419; --panel:#1a222c; --text:#e7eef7; --muted:#9aa8b6; --accent:#3dd6c6; --pos:#5ddea5; --neg:#f07178; --border:#2a3542; --warn:#e6c07b; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:var(--bg); color:var(--text); }
+    header { padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); display:flex; flex-wrap:wrap; gap:1rem; align-items:flex-end; justify-content:space-between; }
+    h1 { margin:0; font-size:1.25rem; letter-spacing:.02em; }
+    .sub { color:var(--muted); font-size:.9rem; margin-top:.35rem; }
+    main { padding:1.25rem 1.5rem 2rem; max-width:1200px; margin:0 auto; }
+    .controls { display:flex; flex-wrap:wrap; gap:.75rem; margin-bottom:1rem; align-items:center; }
+    label { font-size:.85rem; color:var(--muted); display:flex; flex-direction:column; gap:.25rem; }
+    select, button { background:var(--panel); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:.45rem .7rem; }
+    button { cursor:pointer; }
+    button.active { border-color:var(--accent); color:var(--accent); }
+    .stats { color:var(--muted); font-size:.85rem; }
+    .table-wrap { overflow:auto; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
+    table { width:100%; border-collapse:collapse; font-size:.9rem; }
+    th, td { padding:.55rem .7rem; border-bottom:1px solid var(--border); text-align:left; white-space:nowrap; }
+    th { color:var(--muted); font-weight:600; position:sticky; top:0; background:var(--panel); }
+    td.num { text-align:right; font-variant-numeric:tabular-nums; }
+    .delta.pos { color:var(--pos); }
+    .delta.neg { color:var(--neg); }
+    .pill, .flag { font-size:.75rem; padding:.15rem .45rem; border-radius:999px; border:1px solid var(--border); }
+    .flag-clean { border-color:var(--pos); color:var(--pos); }
+    .flag-new_entity { border-color:var(--accent); color:var(--accent); }
+    .flag-suspect_negative_prior { border-color:var(--warn); color:var(--warn); }
+    a { color:var(--accent); }
+    .panel { margin-top:1.25rem; padding:1rem 1.1rem; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
+    .panel h2 { margin:0 0 .5rem; font-size:1rem; }
+    .panel ul { margin:.4rem 0 0 1.1rem; color:var(--muted); }
+    footer { margin-top:1.5rem; padding:1rem 1.5rem 2rem; border-top:1px solid var(--border); color:var(--muted); font-size:.85rem; line-height:1.45; }
+    .soft { font-style:italic; }
+    .empty { color:var(--muted); padding:1rem; }
+    code { font-size:.85em; }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>CapexPulse — Weekly ICT capex movers</h1>
+      <div class="sub" id="subtitle">Loading…</div>
+    </div>
+    <div class="stats" id="stats"></div>
+  </header>
+  <main>
+    <div class="controls">
+      <label>Segment
+        <select id="segment">
+          <option value="ÚSC" selected>ÚSC</option>
+          <option value="OSS">OSS</option>
+          <option value="ALL">All</option>
+        </select>
+      </label>
+      <label>Flag
+        <select id="flag">
+          <option value="clean" selected>clean (default)</option>
+          <option value="new_entity">new_entity</option>
+          <option value="suspect_negative_prior">suspect_negative_prior</option>
+          <option value="ALL">All flags</option>
+        </select>
+      </label>
+      <button type="button" id="btn-explainer">Metric v2.1</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Organisation</th><th>orgId (IČO)</th><th>Seg</th>
+            <th>Prev</th><th>Curr</th><th>Δ Kč</th><th>Flag</th><th>MONITOR</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <p class="empty" id="empty" hidden>No movers for this filter.</p>
+    <section class="panel" id="explainer" hidden>
+      <h2>Metric contract v2.1</h2>
+      <ul>
+        <li>Δ SUM(ZU_ROZKZ) by orgId vs prior period — FinM ÚSC primary, FinOSS secondary</li>
+        <li>|Δ| ≥ 100 000 Kč</li>
+        <li><code>clean</code> = prior present AND prior rozpzm≥0 AND prior rozkz&gt;0</li>
+        <li><code>new_entity</code> = missing prior OR prior rozkz==0</li>
+        <li><code>suspect_negative_prior</code> = prior rozpzm&lt;0 OR prior rozkz&lt;0 (emit; never default lead)</li>
+        <li>Core types are source-agnostic; CZ MONITOR is an adapter. Future: AT / DE / IT</li>
+      </ul>
+    </section>
+  </main>
+  <footer>
+    <p><strong>Zdroj dat:</strong> Ministerstvo financí ČR – MONITOR státní pokladny.</p>
+    <p>MFČR produkt CapexPulse nepodporuje ani neschvaluje.</p>
+    <p><a href="https://monitor.statnipokladna.gov.cz/datovy-katalog/licence" target="_blank" rel="noreferrer">Podmínky užití MONITOR</a></p>
+    <p class="soft">Signal to verify — not gospel. Data mají informativní povahu.</p>
+  </footer>
+  <script>
+    const fmt = (n) => new Intl.NumberFormat('cs-CZ', { maximumFractionDigits: 0 }).format(n || 0);
+    const mon = (ico) => `https://monitor.statnipokladna.gov.cz/ucetni-jednotka/${ico}`;
+    let payload = null;
+
+    function render() {
+      if (!payload) return;
+      const seg = document.getElementById('segment').value;
+      const flag = document.getElementById('flag').value;
+      let rows = payload.movers.slice();
+      if (seg !== 'ALL') rows = rows.filter(r => r.segment === seg);
+      if (flag !== 'ALL') rows = rows.filter(r => r.flag === flag);
+      rows.sort((a,b) => b.delta - a.delta);
+      const tbody = document.getElementById('tbody');
+      tbody.innerHTML = rows.map((r,i) => `
+        <tr>
+          <td>${i+1}</td>
+          <td>${r.orgName || r.name || ''}</td>
+          <td><code>${r.orgId || r.ico}</code></td>
+          <td><span class="pill">${r.segment}</span></td>
+          <td class="num">${fmt(r.prevAmount ?? r.prev)}</td>
+          <td class="num">${fmt(r.currAmount ?? r.curr)}</td>
+          <td class="num delta ${(r.delta>=0)?'pos':'neg'}">${fmt(r.delta)}</td>
+          <td><span class="flag flag-${r.flag}">${r.flag}</span></td>
+          <td><a href="${mon(r.orgId || r.ico)}" target="_blank" rel="noreferrer">open</a></td>
+        </tr>`).join('');
+      document.getElementById('empty').hidden = rows.length > 0;
+      document.getElementById('stats').textContent = `${rows.length} rows · default ÚSC/clean`;
+    }
+
+    document.getElementById('segment').addEventListener('change', render);
+    document.getElementById('flag').addEventListener('change', render);
+    document.getElementById('btn-explainer').addEventListener('click', () => {
+      const el = document.getElementById('explainer');
+      el.hidden = !el.hidden;
+    });
+
+    fetch('./data/movers-2026006.json')
+      .then(r => r.json())
+      .then(data => {
+        payload = data;
+        const m = data.meta || {};
+        document.getElementById('subtitle').textContent =
+          `Period ${m.period || ''} vs ${m.prevPeriod || ''} · položka ${m.budgetLineCode || '6125'} · metric ${m.metricContract || 'v2.1'}`;
+        render();
+      })
+      .catch(err => {
+        document.getElementById('subtitle').textContent = 'Failed to load movers JSON: ' + err;
+      });
+  </script>
+</body>
+</html>

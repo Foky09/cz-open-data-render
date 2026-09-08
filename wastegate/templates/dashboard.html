@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — WasteGate{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="row">
+    <h1>Partner status</h1>
+    <form method="post" action="/alerts/run"><button type="submit">Send status email</button></form>
+  </div>
+  <table>
+    <thead>
+      <tr><th>Country</th><th>Local ID</th><th>Label</th><th>Status</th><th>Operator IČO</th><th>Codes</th><th>Change</th></tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td>{{ r.country }}</td>
+        <td><code>{{ r.localId }}</code></td>
+        <td>{{ r.label }}</td>
+        <td><span class="pill">{{ r.status }}</span></td>
+        <td>{{ r.operatorIco or "—" }}</td>
+        <td>{{ r.wasteCodeCount }}</td>
+        <td>{{ r.changeSummary or "—" }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="7" class="muted">Watchlist empty — add partners.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

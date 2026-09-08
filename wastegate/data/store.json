@@ -1,0 +1,326 @@
+{
+  "users": [
+    {
+      "id": "fcdaadd3-b505-4cec-b5f5-be40285092b7",
+      "email": "demo@wastegate.cz",
+      "passwordHash": "$pbkdf2-sha256$29000$49y7NyakVMoZI8RYC0Eo5Q$NCMxtQzbVF01F1rFEMcJI2M0fHANVoE27PT4B9CVEMw",
+      "createdAt": "2026-09-08T17:07:08.686977+00:00"
+    }
+  ],
+  "watchlist": [
+    {
+      "id": "5a43d967-72cb-493a-9ec4-efda37255ded",
+      "userId": "fcdaadd3-b505-4cec-b5f5-be40285092b7",
+      "country": "CZ",
+      "localId": "CZK00551",
+      "kind": "facility",
+      "label": "BOTEP PLUS — Valeč (aktivni)",
+      "createdAt": "2026-09-08T17:07:08.686977+00:00",
+      "updatedAt": "2026-09-08T17:07:08.686977+00:00"
+    },
+    {
+      "id": "d61ee01f-6566-4716-ba48-28d3c1faf39d",
+      "userId": "fcdaadd3-b505-4cec-b5f5-be40285092b7",
+      "country": "CZ",
+      "localId": "CZK00440",
+      "kind": "facility",
+      "label": "VaK Karlovy Vary — Teplá (ukonceno)",
+      "createdAt": "2026-09-08T17:07:08.686977+00:00",
+      "updatedAt": "2026-09-08T17:07:08.686977+00:00"
+    },
+    {
+      "id": "54bc0983-c843-4069-9608-cb68e1f545db",
+      "userId": "fcdaadd3-b505-4cec-b5f5-be40285092b7",
+      "country": "CZ",
+      "localId": "CZK00499",
+      "kind": "facility",
+      "label": "LB MINERALS (aktivni)",
+      "createdAt": "2026-09-08T17:07:08.686977+00:00",
+      "updatedAt": "2026-09-08T17:07:08.686977+00:00"
+    },
+    {
+      "id": "40c17be8-7396-4f40-b44f-d27ec4379550",
+      "userId": "fcdaadd3-b505-4cec-b5f5-be40285092b7",
+      "country": "CZ",
+      "localId": "CZK00455",
+      "kind": "facility",
+      "label": "PD Power (aktivni)",
+      "createdAt": "2026-09-08T17:07:08.686977+00:00",
+      "updatedAt": "2026-09-08T17:07:08.686977+00:00"
+    },
+    {
+      "id": "0a2df990-d85c-4f78-92f5-e1c14dcda7bb",
+      "userId": "fcdaadd3-b505-4cec-b5f5-be40285092b7",
+      "country": "CZ",
+      "localId": "CZK00238",
+      "kind": "facility",
+      "label": "AVE CZ odpadové hospodářství (aktivni)",
+      "createdAt": "2026-09-08T17:07:08.686977+00:00",
+      "updatedAt": "2026-09-08T17:07:08.686977+00:00"
+    },
+    {
+      "id": "0f18e787-245f-4fbe-a140-9f4be7a5274e",
+      "userId": "fcdaadd3-b505-4cec-b5f5-be40285092b7",
+      "country": "CZ",
+      "localId": "CZK00405",
+      "kind": "facility",
+      "label": "EUROVIA Kamenolomy (aktivni)",
+      "createdAt": "2026-09-08T17:07:08.686977+00:00",
+      "updatedAt": "2026-09-08T17:07:08.686977+00:00"
+    },
+    {
+      "id": "47bc6729-654b-4967-9a41-ecef480f91b8",
+      "userId": "fcdaadd3-b505-4cec-b5f5-be40285092b7",
+      "country": "CZ",
+      "localId": "CZK00372",
+      "kind": "facility",
+      "label": "TECHNICKÝ A DOPRAVNÍ SERVIS (aktivni)",
+      "createdAt": "2026-09-08T17:07:08.686977+00:00",
+      "updatedAt": "2026-09-08T17:07:08.686977+00:00"
+    },
+    {
+      "id": "df9bcb5d-2df1-4e0d-b452-19fb559977ed",
+      "userId": "fcdaadd3-b505-4cec-b5f5-be40285092b7",
+      "country": "CZ",
+      "localId": "CZK00513",
+      "kind": "facility",
+      "label": "RESUR spol. s r.o. (aktivni)",
+      "createdAt": "2026-09-08T17:07:08.686977+00:00",
+      "updatedAt": "2026-09-08T17:07:08.686977+00:00"
+    },
+    {
+      "id": "4ddc00d6-9b71-462f-b034-48aed91e297c",
+      "userId": "fcdaadd3-b505-4cec-b5f5-be40285092b7",
+      "country": "CZ",
+      "localId": "CZK00500",
+      "kind": "facility",
+      "label": "Technické služby Žlutice (aktivni)",
+      "createdAt": "2026-09-08T17:07:08.686977+00:00",
+      "updatedAt": "2026-09-08T17:07:08.686977+00:00"
+    },
+    {
+      "id": "53fd504b-ed55-416a-971f-a7ebc065def3",
+      "userId": "fcdaadd3-b505-4cec-b5f5-be40285092b7",
+      "country": "CZ",
+      "localId": "CZK00465",
+      "kind": "facility",
+      "label": "OEEZ s.r.o. (ukonceno)",
+      "createdAt": "2026-09-08T17:07:08.686977+00:00",
+      "updatedAt": "2026-09-08T17:07:08.686977+00:00"
+    },
+    {
+      "id": "cf76224b-54de-4ed3-a12a-4bc1a1e3e247",
+      "userId": "fcdaadd3-b505-4cec-b5f5-be40285092b7",
+      "country": "CZ",
+      "localId": "COP00017",
+      "kind": "trader",
+      "label": "IGRO s.r.o. — obchodník (IČOB)",
+      "createdAt": "2026-09-08T17:07:08.686977+00:00",
+      "updatedAt": "2026-09-08T17:07:08.686977+00:00"
+    }
+  ],
+  "statuses": [
+    {
+      "localId": "CZK00551",
+      "country": "CZ",
+      "kind": "facility",
+      "status": "aktivni",
+      "operatorIco": "64357571",
+      "wasteCodeCount": 1,
+      "wasteCodesSample": [
+        "8_2021_190805"
+      ],
+      "exportDate": "2026-09-08T03:00:00.801276+02:00",
+      "lastChange": "2026-09-08T03:00:00.801276+02:00",
+      "changeSummary": "baseline"
+    },
+    {
+      "localId": "CZK00440",
+      "country": "CZ",
+      "kind": "facility",
+      "status": "ukonceno",
+      "operatorIco": "49789228",
+      "wasteCodeCount": 0,
+      "wasteCodesSample": [],
+      "exportDate": "2026-09-08T03:00:00.801276+02:00",
+      "lastChange": "2026-09-08T03:00:00.801276+02:00",
+      "changeSummary": "baseline"
+    },
+    {
+      "localId": "CZK00499",
+      "country": "CZ",
+      "kind": "facility",
+      "status": "aktivni",
+      "operatorIco": "27994929",
+      "wasteCodeCount": 1,
+      "wasteCodesSample": [
+        "8_2021_170504"
+      ],
+      "exportDate": "2026-09-08T03:00:00.801276+02:00",
+      "lastChange": "2026-09-08T03:00:00.801276+02:00",
+      "changeSummary": "baseline"
+    },
+    {
+      "localId": "CZK00455",
+      "country": "CZ",
+      "kind": "facility",
+      "status": "aktivni",
+      "operatorIco": "29133327",
+      "wasteCodeCount": 25,
+      "wasteCodesSample": [
+        "8_2021_120106",
+        "8_2021_120107",
+        "8_2021_120110",
+        "8_2021_120119",
+        "8_2021_130109"
+      ],
+      "exportDate": "2026-09-08T03:00:00.801276+02:00",
+      "lastChange": "2026-09-08T03:00:00.801276+02:00",
+      "changeSummary": "baseline"
+    },
+    {
+      "localId": "CZK00238",
+      "country": "CZ",
+      "kind": "facility",
+      "status": "aktivni",
+      "operatorIco": "49356089",
+      "wasteCodeCount": 166,
+      "wasteCodesSample": [
+        "8_2021_020103",
+        "8_2021_020108",
+        "8_2021_030104",
+        "8_2021_030201",
+        "8_2021_030202"
+      ],
+      "exportDate": "2026-09-08T03:00:00.801276+02:00",
+      "lastChange": "2026-09-08T03:00:00.801276+02:00",
+      "changeSummary": "baseline"
+    },
+    {
+      "localId": "CZK00405",
+      "country": "CZ",
+      "kind": "facility",
+      "status": "aktivni",
+      "operatorIco": "27096670",
+      "wasteCodeCount": 12,
+      "wasteCodesSample": [
+        "8_2021_010102",
+        "8_2021_010408",
+        "8_2021_010409",
+        "8_2021_010412",
+        "8_2021_010413"
+      ],
+      "exportDate": "2026-09-08T03:00:00.801276+02:00",
+      "lastChange": "2026-09-08T03:00:00.801276+02:00",
+      "changeSummary": "baseline"
+    },
+    {
+      "localId": "CZK00372",
+      "country": "CZ",
+      "kind": "facility",
+      "status": "aktivni",
+      "operatorIco": "25213261",
+      "wasteCodeCount": 27,
+      "wasteCodesSample": [
+        "8_2021_020103",
+        "8_2021_020107",
+        "8_2021_150101",
+        "8_2021_150102",
+        "8_2021_150104"
+      ],
+      "exportDate": "2026-09-08T03:00:00.801276+02:00",
+      "lastChange": "2026-09-08T03:00:00.801276+02:00",
+      "changeSummary": "baseline"
+    },
+    {
+      "localId": "CZK00513",
+      "country": "CZ",
+      "kind": "facility",
+      "status": "aktivni",
+      "operatorIco": "18225489",
+      "wasteCodeCount": 98,
+      "wasteCodesSample": [
+        "8_2021_020103",
+        "8_2021_020701",
+        "8_2021_030105",
+        "8_2021_030308",
+        "8_2021_040221"
+      ],
+      "exportDate": "2026-09-08T03:00:00.801276+02:00",
+      "lastChange": "2026-09-08T03:00:00.801276+02:00",
+      "changeSummary": "baseline"
+    },
+    {
+      "localId": "CZK00500",
+      "country": "CZ",
+      "kind": "facility",
+      "status": "aktivni",
+      "operatorIco": "26347865",
+      "wasteCodeCount": 77,
+      "wasteCodesSample": [
+        "8_2021_080111",
+        "8_2021_130110",
+        "8_2021_130205",
+        "8_2021_130206",
+        "8_2021_130208"
+      ],
+      "exportDate": "2026-09-08T03:00:00.801276+02:00",
+      "lastChange": "2026-09-08T03:00:00.801276+02:00",
+      "changeSummary": "baseline"
+    },
+    {
+      "localId": "CZK00465",
+      "country": "CZ",
+      "kind": "facility",
+      "status": "ukonceno",
+      "operatorIco": "28181107",
+      "wasteCodeCount": 0,
+      "wasteCodesSample": [],
+      "exportDate": "2026-09-08T03:00:00.801276+02:00",
+      "lastChange": "2026-09-08T03:00:00.801276+02:00",
+      "changeSummary": "baseline"
+    },
+    {
+      "localId": "COP00017",
+      "country": "CZ",
+      "kind": "trader",
+      "status": "aktivni",
+      "operatorIco": "64359387",
+      "wasteCodeCount": 36,
+      "wasteCodesSample": [
+        "8_2021_020110",
+        "8_2021_030105",
+        "8_2021_030308",
+        "8_2021_070213",
+        "8_2021_120101"
+      ],
+      "exportDate": "2026-09-08T03:00:00.801276+02:00",
+      "lastChange": "2026-09-08T03:00:00.801276+02:00",
+      "changeSummary": "baseline"
+    }
+  ],
+  "alerts": [
+    {
+      "id": "3226bb65-d700-4d60-b4bd-9c2db22c667b",
+      "userId": "fcdaadd3-b505-4cec-b5f5-be40285092b7",
+      "createdAt": "2026-09-08T16:51:00+00:00",
+      "subject": "WasteGate: baseline watchlist (2026-09-08)",
+      "body": "WasteGate alert — 2026-09-08\n\nInitial status report (baseline)\n\nCZK00551 — BOTEP PLUS — Valeč (aktivni)\nStatus: aktivni\nOperator IČO: 64357571\nWaste codes: 1\n\nCZK00440 — VaK Karlovy Vary — Teplá (ukonceno)\nStatus: ukonceno\nOperator IČO: 49789228\nWaste codes: 0\n\nCZK00499 — LB MINERALS (aktivni)\nStatus: aktivni\nOperator IČO: 27994929\nWaste codes: 1\n\nCZK00455 — PD Power (aktivni)\nStatus: aktivni\nOperator IČO: 29133327\nWaste codes: 25\n\nCZK00238 — AVE CZ odpadové hospodářství (aktivni)\nStatus: aktivni\nOperator IČO: 49356089\nWaste codes: 166\n\nCZK00405 — EUROVIA Kamenolomy (aktivni)\nStatus: aktivni\nOperator IČO: 27096670\nWaste codes: 12\n\nCZK00372 — TECHNICKÝ A DOPRAVNÍ SERVIS (aktivni)\nStatus: aktivni\nOperator IČO: 25213261\nWaste codes: 27\n\nCZK00513 — RESUR spol. s r.o. (aktivni)\nStatus: aktivni\nOperator IČO: 18225489\nWaste codes: 98\n\nCZK00500 — Technické služby Žlutice (aktivni)\nStatus: aktivni\nOperator IČO: 26347865\nWaste codes: 77\n\nCZK00465 — OEEZ s.r.o. (ukonceno)\nStatus: ukonceno\nOperator IČO: 28181107\nWaste codes: 0\n\nCOP00017 — IGRO s.r.o. — obchodník (IČOB)\nStatus: aktivni\nOperator IČO: 64359387\nWaste codes: 36\n\n---\nZdroj: MŽP ČR – VISOH2 Registr zařízení (veřejný denní export). MŽP produkt nepodporuje. Data mohou obsahovat osobní údaje.",
+      "kind": "baseline",
+      "partnerIds": [
+        "CZK00551",
+        "CZK00440",
+        "CZK00499",
+        "CZK00455",
+        "CZK00238",
+        "CZK00405",
+        "CZK00372",
+        "CZK00513",
+        "CZK00500",
+        "CZK00465",
+        "COP00017"
+      ]
+    }
+  ],
+  "seeded": true
+}

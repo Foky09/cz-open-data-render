@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>{% block title %}WasteGate{% endblock %}</title>
+  <link rel="stylesheet" href="/static/style.css"/>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="/dashboard">WasteGate</a>
+    {% if user %}
+    <nav>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/watchlist">Watchlist</a>
+      <a href="/alerts">Alerts</a>
+      <form method="post" action="/logout" class="inline"><button type="submit">Log out</button></form>
+      <span class="muted">{{ user.email }}</span>
+    </nav>
+    {% endif %}
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="foot"><p>{{ FOOTER }}</p></footer>
+</body>
+</html>

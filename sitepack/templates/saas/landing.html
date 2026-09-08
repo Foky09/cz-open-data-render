@@ -1,0 +1,47 @@
+{% extends "saas/base.html" %}
+{% block title %}SitePack Pro — Parcelní rešerše{% endblock %}
+{% block content %}
+<section class="hero">
+  <h1>Parcelní rešerše pro developery</h1>
+  <p>
+    <strong>Česko (CZ)</strong> — AT/DE/IT později.
+    Vložte RÚIAN Id nebo k.ú. + parcelní číslo. Získejte semafor rizik
+    (povodně, radon, poddolování, sesuvy, územní plán) a stáhněte PDF — přímo v prohlížeči.
+  </p>
+  <div class="hero-actions">
+    <a class="btn btn-lg" href="/app">Spustit rešerši</a>
+    <a class="btn btn-ghost btn-lg" href="/app?demo=1">Demo parcela</a>
+  </div>
+</section>
+
+<div class="grid-3">
+  <div class="card">
+    <h3>1. Identita parcely</h3>
+    <p>RÚIAN Id nebo katastrální území + parcelní číslo. Žádná data o vlastnictví.</p>
+  </div>
+  <div class="card">
+    <h3>2. Vrstvy + semafor</h3>
+    <p>LIVE / STUB / FALLBACK badge u každé vrstvy. Loud disclaimers CZ.</p>
+  </div>
+  <div class="card">
+    <h3>3. PDF v prohlížeči</h3>
+    <p>Stažení HTML/PDF reportu. CLI zůstává jen pro backend/dev.</p>
+  </div>
+</div>
+
+<div class="warn">
+  <strong>⚠ Bez KN ownership · bez outreach</strong>
+  SitePack Pro záměrně neobsahuje údaje o vlastnictví nemovitostí a neoslovuje majitele.
+  Povodně, radon a zoning jsou orientační — viz disclaimery v reportu.
+</div>
+
+<div class="box">
+  <h2>Demo parcela</h2>
+  <p class="hint">
+    RÚIAN <code>{{ demo_ruian }}</code> · {{ demo_ku }} · {{ demo_parcel }}
+  </p>
+  <p style="margin-top:12px">
+    <a class="btn" href="/app">Otevřít formulář</a>
+  </p>
+</div>
+{% endblock %}

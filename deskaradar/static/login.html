@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DeskaRadar — Přihlášení</title>
+  <style>
+    :root {
+      --bg: #0f1419; --panel: #1a2332; --border: #2d3a4d;
+      --text: #e7ecf3; --muted: #8b9bb4; --accent: #3d9cf0; --fail: #f07178;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; display: grid; place-items: center;
+      font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+      background: radial-gradient(ellipse at top, #152033 0%, var(--bg) 55%);
+      color: var(--text);
+    }
+    .card {
+      width: min(400px, 92vw); background: var(--panel);
+      border: 1px solid var(--border); border-radius: 12px; padding: 1.75rem;
+      box-shadow: 0 20px 50px rgba(0,0,0,.35);
+    }
+    h1 { margin: 0 0 .35rem; font-size: 1.4rem; }
+    h1 span { color: var(--accent); }
+    p { margin: 0 0 1.25rem; color: var(--muted); font-size: .9rem; }
+    label { display: block; font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: .35rem; }
+    input {
+      width: 100%; margin-bottom: .9rem; padding: .55rem .7rem; border-radius: 8px;
+      border: 1px solid var(--border); background: #121a26; color: var(--text); font: inherit;
+    }
+    button {
+      width: 100%; padding: .65rem; border: 0; border-radius: 8px;
+      background: var(--accent); color: #061018; font-weight: 650; font: inherit; cursor: pointer;
+    }
+    button:hover { filter: brightness(1.08); }
+    .err { color: var(--fail); font-size: .85rem; min-height: 1.2em; margin-bottom: .5rem; }
+    .hint { margin-top: 1rem; font-size: .8rem; color: var(--muted); }
+    code { background: #121a26; padding: .1em .35em; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <form class="card" id="form">
+    <h1>Deska<span>Radar</span></h1>
+    <p>Demo přihlášení — leady z JMK úředních desek (OFN).</p>
+    <div class="err" id="err"></div>
+    <label for="email">E-mail</label>
+    <input id="email" type="email" autocomplete="username" value="demo@deskaradar.local" required />
+    <label for="password">Heslo</label>
+    <input id="password" type="password" autocomplete="current-password" value="demo" required />
+    <button type="submit">Přihlásit se</button>
+    <div class="hint">Stub auth: libovolný e-mail + heslo <code>demo</code> (nebo <code>demo@deskaradar.local</code> / <code>demo</code>).</div>
+  </form>
+  <script>
+    document.getElementById("form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const err = document.getElementById("err");
+      err.textContent = "";
+      try {
+        const res = await fetch("/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: document.getElementById("email").value,
+            password: document.getElementById("password").value,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          err.textContent = data.error || "Přihlášení selhalo";
+          return;
+        }
+        location.href = "/";
+      } catch (ex) {
+        err.textContent = String(ex);
+      }
+    });
+  </script>
+</body>
+</html>

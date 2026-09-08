@@ -1,0 +1,28 @@
+# WasteGate Day-1 example watchlist (IČZ / IČOB)
+# Copy to watchlist.yaml and edit. Labels are optional (email-friendly names).
+#
+# IDs below exist in the 2026-09-08 VISOH2 sample / full export.
+
+watchlist:
+  - id: CZK00551
+    label: "BOTEP PLUS — Valeč (aktivni)"
+  - id: CZK00440
+    label: "VaK Karlovy Vary — Teplá (ukonceno)"
+  - id: CZK00499
+    label: "LB MINERALS (aktivni)"
+  - id: CZK00455
+    label: "PD Power (aktivni)"
+  - id: CZK00238
+    label: "AVE CZ odpadové hospodářství (aktivni)"
+  - id: CZK00405
+    label: "EUROVIA Kamenolomy (aktivni)"
+  - id: CZK00372
+    label: "TECHNICKÝ A DOPRAVNÍ SERVIS (aktivni)"
+  - id: CZK00513
+    label: "RESUR spol. s r.o. (aktivni)"
+  - id: CZK00500
+    label: "Technické služby Žlutice (aktivni)"
+  - id: CZK00465
+    label: "OEEZ s.r.o. (ukonceno)"
+  - id: COP00017
+    label: "IGRO s.r.o. — obchodník (IČOB)"

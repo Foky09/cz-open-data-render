@@ -1,0 +1,70 @@
+# CZ open-data apps — Render Blueprint (wave 1)
+# Region: Frankfurt (EU). Plan: free for all five web services.
+
+services:
+  - type: web
+    name: deskaradar
+    runtime: python
+    plan: free
+    region: frankfurt
+    rootDir: deskaradar
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.8"
+
+  - type: web
+    name: sitepack
+    runtime: python
+    plan: free
+    region: frankfurt
+    rootDir: sitepack
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.8"
+
+  - type: web
+    name: spectrum
+    runtime: node
+    plan: free
+    region: frankfurt
+    rootDir: spectrum
+    buildCommand: npm install && npm run build
+    startCommand: npx next start -H 0.0.0.0 -p $PORT
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_VERSION
+        value: "20.18.0"
+      - key: NODE_ENV
+        value: production
+
+  - type: web
+    name: wastegate
+    runtime: python
+    plan: free
+    region: frankfurt
+    rootDir: wastegate
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.8"
+
+  - type: web
+    name: capexpulse
+    runtime: python
+    plan: free
+    region: frankfurt
+    rootDir: capexpulse
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.8"

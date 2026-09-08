@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Login — WasteGate{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <h1>Log in</h1>
+  {% if error %}<p class="err">{{ error }}</p>{% endif %}
+  <form method="post" action="/login">
+    <label>Email <input type="email" name="email" required value="demo@wastegate.cz"/></label>
+    <label>Password <input type="password" name="password" required value="demo1234"/></label>
+    <button type="submit">Log in</button>
+  </form>
+  <p class="muted">Demo: demo@wastegate.cz / demo1234 · <a href="/signup">Sign up</a></p>
+</section>
+{% endblock %}

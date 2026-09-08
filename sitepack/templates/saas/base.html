@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>{% block title %}SitePack Pro{% endblock %}</title>
+  <link rel="stylesheet" href="/static/app.css"/>
+</head>
+<body>
+<div class="shell">
+  <nav class="nav">
+    <a class="brand" href="/">SitePack Pro <span>SaaS</span></a>
+    <div class="nav-links">
+      <a href="/">Úvod</a>
+      <a href="/app">Rešerše</a>
+      {% if user %}
+        <span class="user-chip">{{ user.name }} · {{ user.email }}</span>
+        <a href="/logout">Odhlásit</a>
+      {% else %}
+        <a href="/login">Přihlášení</a>
+        <a href="/register">Registrace</a>
+      {% endif %}
+    </div>
+  </nav>
+  <main class="main">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="footer">
+    <strong>Informativní podklad.</strong>
+    Neobsahuje a neslibuje údaje o vlastnictví (KN).
+    Účet = stub session (ne produkční auth).
+    SitePack Pro · bez outreach · bez KN scrape.
+  </footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,56 @@
+{% extends "saas/base.html" %}
+{% block title %}Rešerše — SitePack Pro{% endblock %}
+{% block content %}
+<h1 style="margin-top:0">Nová rešerše parcely</h1>
+<p style="color:var(--muted);margin-top:0">Zadejte RÚIAN Id <em>nebo</em> k.ú. + parcelní číslo. Prázdný formulář / demo = UKÁZKA (FALLBACK).</p>
+
+{% if error %}<div class="error">{{ error }}</div>{% endif %}
+
+<div class="warn">
+  <strong>⚠ Bez dat o vlastnictví (KN)</strong>
+  Výstup je informativní feasibility snapshot. Nenahrazuje stanoviska úřadů ani měření na pozemku.
+</div>
+
+<div class="box">
+  <form method="post" action="/generate">
+    <label for="ruian_id">RÚIAN Id (preferováno)</label>
+    <input id="ruian_id" name="ruian_id" type="text" placeholder="např. {{ demo_ruian }}" value=""/>
+
+    <label for="ku">Katastrální území (kód / název)</label>
+    <input id="ku" name="ku" type="text" placeholder="např. {{ demo_ku }}"/>
+
+    <label for="parcel_number">Parcelní číslo</label>
+    <input id="parcel_number" name="parcel_number" type="text" placeholder="např. {{ demo_parcel }}"/>
+
+    <label class="inline">
+      <input type="checkbox" name="demo" value="1" checked/>
+      Demo mode (hardcoded UKÁZKA / FALLBACK vrstvy)
+    </label>
+    <label class="inline">
+      <input type="checkbox" name="force_live_ruian" value="1"/>
+      Zkusit live RÚIAN probe (VDP — často selže; dokumentovaný hook)
+    </label>
+
+    <p style="margin-top:18px">
+      <button class="btn btn-lg" type="submit">Vygenerovat pack</button>
+    </p>
+    <p class="hint">
+      Demo: RÚIAN <code>{{ demo_ruian }}</code> · {{ demo_ku }} · {{ demo_parcel }}
+      {% if user %}· přihlášen: {{ user.email }}{% else %}· <a href="/login">přihlášení</a> (stub){% endif %}
+    </p>
+  </form>
+</div>
+
+<div class="danger">
+  <strong>⚠ Radon</strong>
+  Regionální mapa 1:50k nenahrazuje měření na pozemku — před výstavbou povinné.
+</div>
+<div class="warn">
+  <strong>⚠ Povodně</strong>
+  Q₁₀₀ / aktivní zóny jsou orientační — ověřte u vodoprávního úřadu.
+</div>
+<div class="info">
+  <strong>ℹ Zoning (light)</strong>
+  Nenahrazuje územní rozhodnutí ani závazné stanovisko.
+</div>
+{% endblock %}

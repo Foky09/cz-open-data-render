@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Watchlist — WasteGate{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>Watchlist</h1>
+  {% if error %}<p class="err">{{ error }}</p>{% endif %}
+  <form method="post" action="/watchlist/add" class="add">
+    <label>Country <input name="country" value="CZ" maxlength="2"/></label>
+    <label>Local ID (IČZ/IČOB) <input name="local_id" required placeholder="CZK00551"/></label>
+    <label>Label <input name="label" placeholder="Optional"/></label>
+    <button type="submit">Add</button>
+  </form>
+  <table>
+    <thead><tr><th>Country</th><th>ID</th><th>Kind</th><th>Label</th><th></th></tr></thead>
+    <tbody>
+      {% for i in items %}
+      <tr>
+        <td>{{ i.country }}</td>
+        <td><code>{{ i.localId }}</code></td>
+        <td>{{ i.kind }}</td>
+        <td>{{ i.label }}</td>
+        <td>
+          <form method="post" action="/watchlist/{{ i.id }}/delete" class="inline">
+            <button type="submit" class="danger">Remove</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="muted">No partners yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

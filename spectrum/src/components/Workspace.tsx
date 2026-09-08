@@ -1,0 +1,396 @@
+"use client";
+
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
+import {
+  AlertsPayload,
+  BUCKET_LABELS,
+  BUCKET_LABELS_CS,
+  BUCKET_ORDER,
+  BucketId,
+  StationRow,
+  stationsToCsv,
+} from "@/lib/domain";
+import { loadSampleCsv, parseUploadedFile, rowsToAlerts } from "@/lib/parseFile";
+import { loadResult, saveResult, clearResult } from "@/lib/storage";
+
+function downloadBlob(filename: string, content: string, mime: string) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function StationTable({ rows, empty }: { rows: StationRow[]; empty?: string }) {
+  if (!rows.length) {
+    return <p className="muted empty-hint">{empty ?? "Žádné stanice v tomto bucketu."}</p>;
+  }
+  return (
+    <div className="table-scroll">
+      <table className="data">
+        <thead>
+          <tr>
+            <th>Callsign</th>
+            <th>Název</th>
+            <th>Freq</th>
+            <th>valid_to</th>
+            <th>dní</th>
+            <th>protected_to</th>
+            <th>bucket</th>
+            <th>akce</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((s) => (
+            <tr
+              key={`${s.callsign}-${s.valid_to}`}
+              className={s.actionable ? "actionable" : undefined}
+            >
+              <td>
+                <strong>{s.callsign}</strong>
+              </td>
+              <td>{s.name}</td>
+              <td>{s.frequency_mhz}</td>
+              <td>{s.valid_to_date ?? "—"}</td>
+              <td>{s.days_to_valid_to ?? "—"}</td>
+              <td>{s.protected_to_date ?? "—"}</td>
+              <td>
+                <span className={`bucket-tag ${s.valid_bucket}`}>
+                  {BUCKET_LABELS_CS[s.valid_bucket]}
+                </span>
+              </td>
+              <td>
+                {s.actionable ? (
+                  <span className="action-pill" title="Obnovit v portálu ČTÚ">
+                    obnovit
+                  </span>
+                ) : (
+                  ""
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+export default function Workspace() {
+  const [payload, setPayload] = useState<AlertsPayload | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [busyLabel, setBusyLabel] = useState("Načítám…");
+  const [dragOver, setDragOver] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const saved = loadResult();
+    if (saved) setPayload(saved);
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimer.current) clearTimeout(toastTimer.current);
+    };
+  }, []);
+
+  const showToast = useCallback((msg: string) => {
+    setToast(msg);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(null), 6000);
+  }, []);
+
+  const applyRows = useCallback((rows: Record<string, unknown>[]) => {
+    const result = rowsToAlerts(rows);
+    setPayload(result);
+    saveResult(result);
+    setError(null);
+  }, []);
+
+  const onFiles = useCallback(
+    async (files: FileList | File[] | null) => {
+      if (!files || !files.length) return;
+      const file = files[0];
+      setBusy(true);
+      setBusyLabel(`Zpracovávám ${file.name}…`);
+      setError(null);
+      try {
+        const rows = await parseUploadedFile(file);
+        applyRows(rows);
+      } catch (e) {
+        const msg = (e as Error).message || "Chyba při načítání souboru";
+        setError(msg);
+        showToast(msg);
+      } finally {
+        setBusy(false);
+        if (inputRef.current) inputRef.current.value = "";
+      }
+    },
+    [applyRows, showToast]
+  );
+
+  const onSample = useCallback(async () => {
+    setBusy(true);
+    setBusyLabel("Načítám ukázková data…");
+    setError(null);
+    try {
+      const rows = await loadSampleCsv();
+      applyRows(rows);
+    } catch (e) {
+      const msg = (e as Error).message || "Chyba při načítání ukázky";
+      setError(msg);
+      showToast(msg);
+    } finally {
+      setBusy(false);
+    }
+  }, [applyRows, showToast]);
+
+  const byBucket = useMemo(() => {
+    const map: Record<BucketId, StationRow[]> = {
+      overdue: [],
+      leq_30: [],
+      leq_60: [],
+      leq_90: [],
+      later: [],
+    };
+    if (!payload) return map;
+    for (const b of BUCKET_ORDER) {
+      map[b] = (payload.buckets[BUCKET_LABELS[b]] as StationRow[]) ?? [];
+    }
+    return map;
+  }, [payload]);
+
+  const actionableCount = payload
+    ? (payload.counts["overdue"] ?? 0) + (payload.counts["≤30"] ?? 0)
+    : 0;
+
+  return (
+    <main className="container">
+      {toast && (
+        <div className="toast toast-error" role="alert">
+          <strong>Chyba souboru</strong>
+          <span>{toast}</span>
+          <button
+            type="button"
+            className="toast-close"
+            aria-label="Zavřít"
+            onClick={() => setToast(null)}
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      <div className="page-head">
+        <div>
+          <h1 style={{ marginBottom: "0.35rem" }}>Pracovní plocha</h1>
+          <p className="muted" style={{ marginTop: 0, marginBottom: 0 }}>
+            Upload CSV/XLSX → kalendář obnov a actionable alerty.{" "}
+            <span className="badge badge-warn">bez auto-prodloužení</span>
+          </p>
+        </div>
+        <Link href="/settings" className="btn btn-secondary btn-sm">
+          Nastavení / ČTÚ
+        </Link>
+      </div>
+
+      <div
+        className={`dropzone ${dragOver ? "dragover" : ""} ${busy ? "busy" : ""}`}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragOver(true);
+        }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragOver(false);
+          if (!busy) onFiles(e.dataTransfer.files);
+        }}
+        onClick={() => !busy && inputRef.current?.click()}
+        role="button"
+        tabIndex={0}
+        aria-busy={busy}
+        onKeyDown={(e) => {
+          if (!busy && (e.key === "Enter" || e.key === " ")) inputRef.current?.click();
+        }}
+      >
+        {busy ? (
+          <>
+            <div className="spinner" aria-hidden />
+            <strong>{busyLabel}</strong>
+            <p>Počkejte, parsuji valid_to (unix / ISO)…</p>
+          </>
+        ) : (
+          <>
+            <strong>Přetáhněte CSV / XLSX sem</strong>
+            <p>
+              nebo klikněte pro výběr · povinný sloupec <code>valid_to</code> (unix
+              nebo ISO)
+            </p>
+          </>
+        )}
+        <input
+          ref={inputRef}
+          type="file"
+          accept=".csv,.xlsx,.xlsm,.xls,text/csv"
+          className="sr-only"
+          disabled={busy}
+          onChange={(e) => onFiles(e.target.files)}
+        />
+      </div>
+
+      <div className="toolbar">
+        <button type="button" className="btn" onClick={onSample} disabled={busy}>
+          Načíst ukázku
+        </button>
+        <button
+          type="button"
+          className="btn btn-secondary"
+          onClick={() => inputRef.current?.click()}
+          disabled={busy}
+        >
+          Vybrat soubor
+        </button>
+        {payload && (
+          <button
+            type="button"
+            className="btn btn-ghost"
+            onClick={() => {
+              clearResult();
+              setPayload(null);
+              setError(null);
+            }}
+            disabled={busy}
+          >
+            Vymazat
+          </button>
+        )}
+        {hydrated && payload && (
+          <span className="muted">
+            K {payload.as_of_date} (Europe/Prague) · {payload.stations.length} stanic
+          </span>
+        )}
+      </div>
+
+      {error && (
+        <div className="error" role="alert">
+          <strong>Nepodařilo se načíst soubor.</strong> {error}
+        </div>
+      )}
+
+      {payload && (
+        <>
+          <div className="summary summary-sticky" aria-label="Souhrn bucketů">
+            {BUCKET_ORDER.map((b) => (
+              <a key={b} href={`#bucket-${b}`} className={`summary-item ${b}`}>
+                <span className="n">{payload.counts[BUCKET_LABELS[b]] ?? 0}</span>
+                <span className="l">{BUCKET_LABELS_CS[b]}</span>
+              </a>
+            ))}
+            <a href="#alerts" className="summary-item actionable">
+              <span className="n">{actionableCount}</span>
+              <span className="l">k obnově</span>
+            </a>
+          </div>
+
+          <div className="toolbar">
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() =>
+                downloadBlob(
+                  "spectrumdeadline-calendar.csv",
+                  stationsToCsv(payload.stations),
+                  "text/csv;charset=utf-8"
+                )
+              }
+            >
+              Export CSV
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() =>
+                downloadBlob(
+                  "spectrumdeadline-alerts.json",
+                  JSON.stringify(payload, null, 2) + "\n",
+                  "application/json"
+                )
+              }
+            >
+              Export JSON
+            </button>
+            <span className="badge badge-warn">bez auto-prodloužení</span>
+          </div>
+
+          <section id="alerts">
+            <div className="section-title">
+              <h2>K obnově (overdue ∪ ≤30)</h2>
+              <span className="muted">{actionableCount} stanic · obnovte v portálu ČTÚ</span>
+            </div>
+            <div className={`card ${actionableCount ? "card-actionable" : ""}`}>
+              <StationTable
+                rows={payload.actionable}
+                empty="Žádné stanice k obnově — v pohodě. Nic neprodloužíme automaticky."
+              />
+            </div>
+          </section>
+
+          {BUCKET_ORDER.map((b) => (
+            <section key={b} id={`bucket-${b}`}>
+              <div className="section-title">
+                <h2>
+                  {BUCKET_LABELS_CS[b]}{" "}
+                  <span className="muted">({BUCKET_LABELS[b]})</span>
+                </h2>
+                <span className="muted">{byBucket[b].length}</span>
+              </div>
+              <div className="card">
+                <StationTable rows={byBucket[b]} />
+              </div>
+            </section>
+          ))}
+
+          <p className="footer-note">
+            SpectrumDeadline <strong>neobnovuje</strong> licence automaticky (bez
+            auto-prodloužení). Obnovu proveďte v portálu ČTÚ. Výsledek je uložen v
+            localStorage prohlížeče.
+          </p>
+        </>
+      )}
+
+      {!payload && hydrated && (
+        <div className="card empty-state" style={{ marginTop: "1rem" }}>
+          <h3>Jak začít</h3>
+          <ol>
+            <li>
+              Nahrajte export stanic z ČTÚ (<strong>CSV / XLSX</strong>) se sloupcem{" "}
+              <code>valid_to</code>, nebo klikněte „Načíst ukázku“.
+            </li>
+            <li>
+              Prohlédněte bucket kalendář a sekci <strong>K obnově</strong> (overdue ∪
+              ≤30).
+            </li>
+            <li>
+              Exportujte CSV/JSON pro další workflow —{" "}
+              <strong>bez auto-prodloužení</strong>.
+            </li>
+          </ol>
+          <p className="muted" style={{ marginBottom: 0 }}>
+            Tip: datumy můžou být smíšené (unix i ISO <code>YYYY-MM-DD</code>). Live
+            sync ČTÚ API přijde později — zatím{" "}
+            <Link href="/settings">Nastavení / ČTÚ</Link> (stub).
+          </p>
+        </div>
+      )}
+    </main>
+  );
+}

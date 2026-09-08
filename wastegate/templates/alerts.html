@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Alerts — WasteGate{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="row">
+    <h1>Email alerts</h1>
+    <form method="post" action="/alerts/run"><button type="submit">Generate now</button></form>
+  </div>
+  <ul class="list">
+    {% for a in alerts %}
+    <li><a href="/alerts/{{ a.id }}"><strong>{{ a.subject }}</strong></a>
+      <span class="muted">{{ a.createdAt }} · {{ a.kind }}</span></li>
+    {% else %}
+    <li class="muted">No alerts yet.</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}
