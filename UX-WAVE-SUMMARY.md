@@ -72,3 +72,19 @@ Date: 2026-09-08 (PT). Design system: Fraunces + Nunito Sans, paper `#F7F4EF`, i
 
 **Files:** globals.css, layout.tsx, page.tsx, settings/page.tsx, Workspace.tsx, ConnectPanel.tsx
 **Synced to:** /workspace/spectrum/app/src/
+
+
+## P0 copy remint
+Date: 2026-09-08 (PT). Source: `/workspace/ux-audit/paste-ready-cz.md`.
+
+Applied Czech P0 landing copy (eyebrow / H1 / sub / CTAs / 3 benefits / 3 how-it-works / footer) to all five apps; kill-list jargon removed from hero + how-it-works; brand accents unchanged; primary CTAs deep-link into real workflows.
+
+| App | Landing | Primary CTA → |
+|-----|---------|---------------|
+| CapexPulse | `capexpulse/landing.html` | Ukázat tohoto týdne → `/app` |
+| DeskaRadar | `deskaradar/static/landing.html` | Chci dnešní leady → `/login` |
+| SitePack | `sitepack/templates/saas/landing.html` (+ base footer) | Ověřit parcelu → `/app` |
+| WasteGate | `wastegate/templates/landing.html` | **Hlídat první partnery** → `/signup` |
+| Spectrum | `spectrum/src/app/page.tsx` | Ukázat stanice k obnově → `/app` |
+
+Also: CapexPulse `index.html` flag select labels → v pořádku / nová jednotka / zkontrolovat. Mirrors synced (capexpulse/dashboard, deskaradar/app, sitepack/concierge, wastegate/app, spectrum/app). `next build` green; Python mains AST-OK; no git commit.

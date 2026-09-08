@@ -44,12 +44,14 @@ function HeroVisual() {
   );
 }
 
-function IconUpload() {
+function IconCalm() {
   return (
     <svg className="feat-icon" viewBox="0 0 40 40" fill="none" aria-hidden>
       <rect width="40" height="40" rx="12" fill="#CCFBF1" />
-      <path d="M20 28V14M20 14l-6 6M20 14l6 6" stroke="#0D9488" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M12 30h16" stroke="#0D9488" strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M12 22c2-4 5-6 8-6s6 2 8 6" stroke="#0D9488" strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="16" cy="18" r="1.5" fill="#0D9488" />
+      <circle cx="24" cy="18" r="1.5" fill="#0D9488" />
+      <path d="M14 27h12" stroke="#0D9488" strokeWidth="2.5" strokeLinecap="round" />
     </svg>
   );
 }
@@ -82,22 +84,18 @@ export default function LandingPage() {
       <section className="hero">
         <div className="hero-grid">
           <div>
-            <span className="badge badge-warn">bez auto-prodloužení</span>
-            <h1>Licence RLAN pod kontrolou — ne v Excelu o půlnoci</h1>
+            <span className="badge badge-warn">Pro české WISP · kalendář obnov RLAN</span>
+            <h1>Které stanice obnovit v příštích 90 dnech — ať nespadne pokrytí</h1>
             <p className="lead">
-              SpectrumDeadline je kalendář obnov pro české WISP: nahrajete export stanic
-              z ČTÚ a hned vidíte, co je po termínu, co hoří do 30 dní a co ještě počká.
-              Jen upozorňujeme — <strong>neobnovujeme automaticky</strong>.
+              Nahrajete export stanic z ČTÚ a hned vidíte: po termínu, do 30 / 60 / 90 dní.
+              Jen připomínáme — obnovu děláte vy v portálu ČTÚ.
             </p>
             <div className="cta-row">
               <Link href="/app" className="btn">
-                Otevřít pracovní plochu
+                Ukázat stanice k obnově
               </Link>
               <Link href="/app" className="btn btn-secondary">
                 Vyzkoušet na ukázce
-              </Link>
-              <Link href="/settings" className="btn btn-ghost">
-                Nastavení ČTÚ →
               </Link>
             </div>
           </div>
@@ -109,143 +107,55 @@ export default function LandingPage() {
 
       <div className="notice" role="note">
         <strong>Hranice produktu:</strong> žádné automatické prodloužení licence. Obnovu
-        provádíte vy v portálu ČTÚ (typicky když zbývá &lt;1 měsíc). Tento nástroj =
-        kalendář + alerty ze souboru stanic.
+        provádíte vy v portálu ČTÚ. Tento nástroj = kalendář + připomínky ze souboru stanic.
       </div>
 
-      <section className="landing-section" aria-labelledby="problem-heading">
-        <h2 id="problem-heading">Proč WISP ztrácejí klid</h2>
-        <p className="section-lead">
-          RLAN cyklus je 12 + 6 měsíců. Portál pustí obnovu až těsně před koncem. Bez
-          přehledu se to snadno přehlédne.
-        </p>
-        <ul className="problem-list">
-          <li>
-            <span className="emoji" aria-hidden>
-              📡
-            </span>
-            <div>
-              <strong>Desítky (nebo stovky) stanic</strong>
-              <span>
-                Každá má jiné valid_to. Sledovat to v tabulce ručně je náchylné na chyby.
-              </span>
-            </div>
-          </li>
-          <li>
-            <span className="emoji" aria-hidden>
-              ⏰
-            </span>
-            <div>
-              <strong>Okno obnovy je krátké</strong>
-              <span>
-                Typicky &lt;1 měsíc před koncem platnosti — kdo nemá alert, riskuje výpadek
-                pokrytí.
-              </span>
-            </div>
-          </li>
-          <li>
-            <span className="emoji" aria-hidden>
-              🧾
-            </span>
-            <div>
-              <strong>Export z ČTÚ ≠ srozumitelný plán</strong>
-              <span>
-                Unix timestampy a smíšená data. Potřebujete bucket kalendář, ne další
-                sloupec.
-              </span>
-            </div>
-          </li>
-        </ul>
-      </section>
-
-      <section className="landing-section" aria-labelledby="how-heading">
-        <h2 id="how-heading">Jak to funguje</h2>
-        <p className="section-lead">
-          Tři kroky. Žádný účet, data zůstanou v prohlížeči (localStorage).
-        </p>
-        <div className="steps">
-          <div className="step-card">
-            <h3>Upload</h3>
-            <p>
-              Přetáhněte CSV nebo XLSX export stanic. Povinný sloupec{" "}
-              <code>valid_to</code> (unix i ISO, i smíšeně).
-            </p>
-          </div>
-          <div className="step-card">
-            <h3>Bucket kalendář</h3>
-            <p>
-              Spočítáme dny do konce (Europe/Prague) a roztřídíme: po termínu / ≤30 / ≤60
-              / ≤90 / později.
-            </p>
-          </div>
-          <div className="step-card">
-            <h3>Obnova u ČTÚ</h3>
-            <p>
-              Sekce <strong>K obnově</strong> = overdue ∪ ≤30. Export CSV/JSON — obnovu
-              provedete vy v portálu.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="landing-section" aria-labelledby="features-heading">
-        <h2 id="features-heading">Co dostanete</h2>
-        <p className="section-lead">
-          Nástroj pro operátory, ne další generický dashboard.
-        </p>
+      <section className="landing-section" aria-labelledby="benefits-heading">
+        <h2 id="benefits-heading">Proč SpectrumDeadline</h2>
         <div className="grid-3">
           <div className="card feature">
             <span className="feature-num" aria-hidden>
               01
             </span>
-            <IconUpload />
-            <h3>Chytrý parser</h3>
-            <p>
-              Unix, ISO, Excel serial, české <code>DD.MM.YYYY</code> — i v jednom souboru.
-              Volitelně callsign, name, frekvence, protected_to.
-            </p>
+            <IconCalm />
+            <h3>Klid místo půlnocního Excelu</h3>
+            <p>Přehled naléhavosti bez ručního sledování desítek termínů.</p>
           </div>
           <div className="card feature">
             <span className="feature-num" aria-hidden>
               02
             </span>
             <IconBuckets />
-            <h3>Bucket přehled</h3>
-            <p>
-              Sticky souhrn + tabulky podle urgency. Cyklus 12 + 6 = 18 měsíců je v
-              doménových pravidlech.
-            </p>
+            <h3>Jasná fronta „obnovit teď“</h3>
+            <p>Po termínu + do 30 dní — víte, co řešit jako první.</p>
           </div>
           <div className="card feature">
             <span className="feature-num" aria-hidden>
               03
             </span>
             <IconAlert />
-            <h3>Actionable alerty</h3>
-            <p>
-              Jasný seznam „obnovit teď“. Bez auto-prodloužení — výsledek můžete exportovat
-              do svého workflow.
-            </p>
+            <h3>Bez automatického prodloužení</h3>
+            <p>Rozhodujete vy. My jen připomínáme a exportujeme seznam.</p>
           </div>
         </div>
       </section>
 
-      <section className="card landing-section" style={{ marginTop: "2rem" }}>
-        <h2 style={{ marginTop: 0 }}>Doménová pravidla</h2>
-        <ul className="muted" style={{ marginBottom: 0 }}>
-          <li>
-            Oficiální cyklus:{" "}
-            <strong>12 měsíců platnost + 6 měsíců ochrana = 18 měsíců</strong>
-          </li>
-          <li>Portál umožňuje obnovu typicky při &lt;1 měsíci → actionable ≤30 dní</li>
-          <li>
-            Časová zóna výpočtu: <strong>Europe/Prague</strong>
-          </li>
-          <li>
-            MVP: upload-only (live ČTÚ API sync připravujeme — viz{" "}
-            <Link href="/settings">Nastavení</Link>)
-          </li>
-        </ul>
+      <section className="landing-section" aria-labelledby="how-heading">
+        <h2 id="how-heading">Jak to funguje</h2>
+        <div className="steps">
+          <div className="step-card">
+            <h3>1. Stáhnete seznam</h3>
+            <p>Stáhnete seznam stanic z portálu ČTÚ.</p>
+          </div>
+          <div className="step-card">
+            <h3>2. Přetáhnete soubor</h3>
+            <p>Soubor sem přetáhnete (nebo vyzkoušíte ukázku).</p>
+          </div>
+          <div className="step-card">
+            <h3>3. Kalendář + export</h3>
+            <p>Vidíte kalendář podle naléhavosti a export „k obnově“.</p>
+          </div>
+        </div>
       </section>
 
       <section className="cta-banner" aria-labelledby="cta-heading">
@@ -256,16 +166,16 @@ export default function LandingPage() {
         </p>
         <div className="cta-row">
           <Link href="/app" className="btn">
-            Jít do aplikace
+            Ukázat stanice k obnově
           </Link>
-          <Link href="/settings" className="btn btn-secondary">
-            Připojení ČTÚ (brzy)
+          <Link href="/app" className="btn btn-secondary">
+            Vyzkoušet na ukázce
           </Link>
         </div>
       </section>
 
       <p className="footer-note">
-        SpectrumDeadline MVP · Česky-first UI · bez auto-prodloužení / no auto-renew
+        Obnovu provádíte v ČTÚ · žádné auto-prodloužení.
       </p>
     </main>
   );

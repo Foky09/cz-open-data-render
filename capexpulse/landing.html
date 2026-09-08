@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CapexPulse — ICT capex movers z MONITOR</title>
+  <title>CapexPulse — ICT rozpočty obcí před tendrem</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -49,7 +49,7 @@
       border:2px solid var(--blue); color:var(--blue-dark); padding:.25rem .55rem; border-radius:6px;
       transform:rotate(-2deg); margin-bottom:1rem;
     }
-    .hero h1 { margin:0 0 .75rem; font-size:clamp(1.8rem,4vw,2.6rem); max-width:16ch; }
+    .hero h1 { margin:0 0 .75rem; font-size:clamp(1.8rem,4vw,2.6rem); max-width:18ch; }
     .hero p { color:var(--muted); max-width:42rem; margin:0 0 1.4rem; font-size:1.05rem; }
     .actions { display:flex; gap:.75rem; flex-wrap:wrap; }
     .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem; }
@@ -73,25 +73,26 @@
 <body>
   <nav class="nav">
     <a class="brand" href="/">Capex<span>Pulse</span> <em>●</em></a>
-    <a class="btn" href="/app">Otevřít dashboard</a>
+    <a class="btn" href="/app">Ukázat tohoto týdne</a>
   </nav>
   <div class="wrap">
     <section class="hero">
-      <div class="stamp">MONITOR · ICT capex</div>
-      <h1>Kdo skokově zvýšil ICT investice</h1>
-      <p>CapexPulse srovnává Δ SUM(ZU_ROZKZ) u položky 6125 napříč ÚSC/OSS v datech MONITOR státní pokladny. Weekly movers, flagy clean / new_entity / suspect — signal to verify, not gospel.</p>
+      <div class="stamp">Pro B2G prodejce · před výběrovým řízením</div>
+      <h1>Víš, která obec navyšuje IT rozpočet, ještě než vypíše tendr</h1>
+      <p>Týdenní přehled obcí a úřadů se skokovým růstem výdajů na ICT. Uvidíte kdo, odstavec rozpočtu a Δ v Kč — signál k ověření, ne hotový tendr.</p>
       <div class="actions">
-        <a class="btn" href="/app">Spustit movers dashboard</a>
-        <a class="btn btn-ghost" href="#jak">Jak to funguje</a>
+        <a class="btn" href="/app">Ukázat tohoto týdne</a>
+        <a class="btn btn-ghost" href="#jak">Jak číst signál</a>
       </div>
     </section>
 
     <section class="section">
       <div class="squiggle"></div>
-      <h2>Problém</h2>
+      <h2>Proč CapexPulse</h2>
       <div class="grid">
-        <div class="card"><h3>Capex je skrytý v rozpočtech</h3><p>Bez Δ filtru nevidíte, kdo právě nakupuje ICT — a obchodní timing uteče.</p></div>
-        <div class="card"><h3>Šum v datech</h3><p>New entity a negative prior nesmí být default lead. Proto máme flagy.</p></div>
+        <div class="card"><h3>Timing dřív než NEN</h3><p>Rozpočet se hýbe před tendrem — uvidíte signál dřív než výběrové řízení.</p></div>
+        <div class="card"><h3>Konkrétní Δ Kč + obec/úřad (ORP)</h3><p>Ne abstraktní grafy — konkrétní kdo a o kolik.</p></div>
+        <div class="card"><h3>Méně falešných stop</h3><p>Oddělíme nové jednotky a podezřelý šum od skutečných movers.</p></div>
       </div>
     </section>
 
@@ -99,32 +100,22 @@
       <div class="squiggle"></div>
       <h2>Jak to funguje</h2>
       <div class="grid">
-        <div class="card"><div class="num">01</div><h3>Načteme periody</h3><p>FinM ÚSC primary, FinOSS secondary — MONITOR open data.</p></div>
-        <div class="card"><div class="num">02</div><h3>Spočítáme Δ</h3><p>|Δ| ≥ 100 000 Kč, metric contract v2.1, dry-run MONITOR adapter.</p></div>
-        <div class="card"><div class="num">03</div><h3>Filtujeme leady</h3><p>Segment, flag, fulltext search, KPI chips, odkaz do MONITOR.</p></div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="squiggle"></div>
-      <h2>Funkce</h2>
-      <div class="grid">
-        <div class="card"><h3>KPI chips</h3><p>Počet movers, suma Δ, podíl clean — hned nahoře.</p></div>
-        <div class="card"><h3>Search + filtry</h3><p>Hledání podle názvu / IČO, segment ÚSC/OSS, flag.</p></div>
-        <div class="card"><h3>MONITOR odkazy</h3><p>Každý řádek otevře účetní jednotku v MONITOR.</p></div>
+        <div class="card"><div class="num">01</div><h3>Otevřená data</h3><p>Bereme otevřená data státní pokladny (MONITOR).</p></div>
+        <div class="card"><div class="num">02</div><h3>Skokové změny</h3><p>Najdeme, kdo mezi obdobími skokově zvedl ICT výdaje.</p></div>
+        <div class="card"><div class="num">03</div><h3>Žebříček movers</h3><p>Žebříček „movers“ s odkazem do MONITOR.</p></div>
       </div>
     </section>
 
     <div class="cta">
       <div>
-        <h2 style="margin:0">Podívejte se na movers</h2>
+        <h2 style="margin:0">Podívejte se na tento týden</h2>
         <p style="margin:.35rem 0 0;color:var(--muted)">Veřejný dashboard, bez loginu.</p>
       </div>
-      <a class="btn" href="/app">Otevřít appku →</a>
+      <a class="btn" href="/app">Ukázat tohoto týdne →</a>
     </div>
   </div>
   <footer>
-    Zdroj: MFČR – MONITOR. MFČR produkt CapexPulse nepodporuje.
+    Zdroj: MONITOR · MFČR. Signál k ověření, ne gospel.
     <a href="https://monitor.statnipokladna.gov.cz/datovy-katalog/licence" target="_blank" rel="noreferrer">Licence</a>
   </footer>
 </body>

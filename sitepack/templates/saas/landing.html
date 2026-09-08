@@ -1,51 +1,41 @@
 {% extends "saas/base.html" %}
-{% block title %}SitePack Pro — Parcelní rešerše pro developery{% endblock %}
+{% block title %}SitePack Pro — zabij špatný pozemek za minuty{% endblock %}
 {% block content %}
 <section class="hero">
-  <div class="stamp">Česko · RÚIAN</div>
-  <h1>Parcelní rešerše bez KN ownership chaosu</h1>
+  <div class="stamp">Pro projectanty a developery · Česko</div>
+  <h1>Zabij špatný pozemek za minuty, ne za dny</h1>
   <p>
-    Vložte RÚIAN Id nebo k.ú. + parcelní číslo. Získejte semafor rizik
-    (povodně, radon, poddolování, sesuvy, územní plán) a stáhněte PDF — přímo v prohlížeči.
-    Papírový feel, ne fialový SaaS gradient.
+    Semafor rizik na jedné stránce: povodně, radon, poddolování, sesuvy, územní plán. PDF během minut. Bez údajů o vlastníkovi — jen feasibility.
   </p>
   <div class="hero-actions">
-    <a class="btn btn-lg" href="/app">Spustit rešerši</a>
-    <a class="btn btn-ghost btn-lg" href="/app?demo=1">Demo parcela</a>
+    <a class="btn btn-lg" href="/app">Ověřit parcelu</a>
+    <a class="btn btn-ghost btn-lg" href="/app?demo=1">Vyzkoušet demo parcelu</a>
   </div>
 </section>
 
 <div class="squiggle"></div>
-<h2 class="section-title" style="margin-top:0">Problém</h2>
+<h2 class="section-title" style="margin-top:0">Proč SitePack</h2>
 <div class="grid-3">
   <div class="card">
-    <h3>Data jsou roztříštěná</h3>
-    <p>Povodně jinde, radon jinde, ÚP jinde. Developer ztrácí půl dne na jednu parcelu.</p>
+    <h3>Kill / no-kill na první pohled</h3>
+    <p>Semafor rizik hned řekne, jestli má parcela smysl pokračovat.</p>
   </div>
   <div class="card">
-    <h3>Ownership je past</h3>
-    <p>SitePack záměrně neřeší KN vlastnictví ani outreach — jen feasibility snapshot.</p>
+    <h3>Všechny vrstvy pohromadě</h3>
+    <p>Ne půl dne po webech — povodně, radon, poddolování, sesuvy i územní plán na jedné stránce.</p>
   </div>
   <div class="card">
-    <h3>Potřebujete PDF teď</h3>
-    <p>Ne CLI v terminálu. Prohlížeč → semafor → HTML/PDF report.</p>
+    <h3>PDF rovnou z prohlížeče</h3>
+    <p>Do spisu / klientovi během minut — rovnou z prohlížeče.</p>
   </div>
 </div>
 
 <div class="squiggle"></div>
 <h2 class="section-title">Jak to funguje</h2>
 <div class="grid-3">
-  <div class="card"><div class="num">01</div><h3>Identita parcely</h3><p>RÚIAN Id nebo katastrální území + parcelní číslo. Žádná data o vlastnictví.</p></div>
-  <div class="card"><div class="num">02</div><h3>Vrstvy + semafor</h3><p>LIVE / STUB / FALLBACK badge u každé vrstvy. Loud disclaimery CZ.</p></div>
-  <div class="card"><div class="num">03</div><h3>PDF v prohlížeči</h3><p>Stažení HTML/PDF reportu. CLI zůstává jen pro backend/dev.</p></div>
-</div>
-
-<div class="squiggle"></div>
-<h2 class="section-title">Funkce</h2>
-<div class="grid-3">
-  <div class="card"><h3>Semafor rizik</h3><p>Povodně, radon, poddolování, sesuvy, zoning — přehledně na jedné stránce.</p></div>
-  <div class="card"><h3>Progress + chyby</h3><p>Jasné kroky generování a přátelské chybové stavy při neúplném vstupu.</p></div>
-  <div class="card"><h3>Demo parcela</h3><p>RÚIAN <code>{{ demo_ruian }}</code> · {{ demo_ku }} · {{ demo_parcel }}</p></div>
+  <div class="card"><div class="num">01</div><h3>Zadáte parcelu</h3><p>Číslo + katastrální území (RÚIAN Id můžete použít ve formuláři).</p></div>
+  <div class="card"><div class="num">02</div><h3>Projdeme mapy</h3><p>Projdeme rizikové mapy a územní plán.</p></div>
+  <div class="card"><div class="num">03</div><h3>Semafor + PDF</h3><p>Dostanete semafor + PDF shrnutí.</p></div>
 </div>
 
 <div class="warn">
@@ -56,9 +46,9 @@
 
 <div class="cta-band">
   <div>
-    <h2>Začněte s demo parcelou</h2>
-    <p>Bez instalace. Výsledek za pár sekund.</p>
+    <h2>Ověřte parcelu teď</h2>
+    <p>Bez instalace. Výsledek za pár minut.</p>
   </div>
-  <a class="btn" href="/app">Otevřít formulář →</a>
+  <a class="btn" href="/app">Ověřit parcelu →</a>
 </div>
 {% endblock %}

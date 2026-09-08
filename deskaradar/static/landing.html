@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>DeskaRadar — stavební leady z úředních desek</title>
+  <title>DeskaRadar — stavební záměry z úředních desek JMK</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -53,7 +53,7 @@
       border:2px solid var(--accent); color:var(--accent-dark); padding:.25rem .55rem; border-radius:6px;
       transform:rotate(-3deg); margin-bottom:1rem;
     }
-    .hero h1 { font-size:clamp(1.8rem,4vw,2.75rem); margin:0 0 .75rem; max-width:16ch; }
+    .hero h1 { font-size:clamp(1.8rem,4vw,2.75rem); margin:0 0 .75rem; max-width:18ch; }
     .hero p.lead { font-size:1.1rem; color:var(--muted); max-width:42rem; margin:0 0 1.5rem; }
     .hero-actions { display:flex; gap:.75rem; flex-wrap:wrap; }
     .section { margin:3rem 0; }
@@ -68,10 +68,6 @@
     }
     .card h3 { margin:.2rem 0 .45rem; font-size:1.1rem; }
     .card p { margin:0; color:var(--muted); font-size:.95rem; }
-    .problem {
-      display:grid; grid-template-columns:1.1fr .9fr; gap:1.25rem; align-items:stretch;
-    }
-    @media (max-width:800px){ .problem { grid-template-columns:1fr; } }
     .squiggle {
       height:3px; width:72px; background:transparent; border:none; border-top:3px solid var(--accent);
       border-radius:2px; margin:0 0 1rem; transform:rotate(-2deg);
@@ -91,32 +87,27 @@
     <a class="brand" href="/">Deska<span>Radar</span></a>
     <div class="nav-links">
       <a class="btn btn-ghost" href="#jak">Jak to funguje</a>
-      <a class="btn" href="/login">Vyzkoušet demo</a>
+      <a class="btn" href="/login">Chci dnešní leady</a>
     </div>
   </nav>
   <div class="wrap">
     <section class="hero">
-      <div class="stamp">JMK · OFN desky</div>
-      <h1>Stavební leady dřív, než se objeví v tendru</h1>
-      <p class="lead">DeskaRadar hlídá úřední desky Jihomoravského kraje (OFN JSON-LD), třídí stavební / záměr oznámení a posílá vám denní digest. Bez eDesky scrape. Bez generického SaaS fialového gradientu.</p>
+      <div class="stamp">Jihomoravský kraj · stavební záměry</div>
+      <h1>Chyť stavební záměr na úřední desce dřív než konkurence</h1>
+      <p class="lead">Denně jen stavební a územní oznámení z desek JMK — filtr podle obce, denní přehled, export do CRM. Ne celá deska.</p>
       <div class="hero-actions">
-        <a class="btn" href="/login">Otevřít demo appku</a>
-        <a class="btn btn-ghost" href="#problem">Proč to řešíme</a>
+        <a class="btn" href="/login">Chci dnešní leady</a>
+        <a class="btn btn-ghost" href="#jak">Jak to funguje</a>
       </div>
     </section>
 
-    <section class="section" id="problem">
+    <section class="section" id="benefity">
       <div class="squiggle"></div>
-      <h2>Problém</h2>
-      <div class="problem">
-        <div class="card">
-          <h3>Desky jsou šum</h3>
-          <p>Stovky oznámení denně. Ruční kontrola eDesky a obecních webů žere hodiny — a stejně vám unikne územka vedle vašeho pozemku.</p>
-        </div>
-        <div class="card">
-          <h3>Co potřebujete</h3>
-          <p>Filtrované stavební leady podle obce / kraje, s jistotou klasifikace a exportem pro CRM. Ne další „AI platformu“.</p>
-        </div>
+      <h2>Proč DeskaRadar</h2>
+      <div class="grid">
+        <div class="card"><h3>Dřív než tendr</h3><p>Záměr vidíte už na úřední desce — dřív než se objeví ve výběrovém řízení.</p></div>
+        <div class="card"><h3>Méně šumu</h3><p>Jen stavební/územní, ne stovky oznámení z celé desky.</p></div>
+        <div class="card"><h3>Hotové pro obchod</h3><p>Denní digest + CSV do CRM — rovnou do workflow.</p></div>
       </div>
     </section>
 
@@ -124,31 +115,20 @@
       <div class="squiggle"></div>
       <h2>Jak to funguje</h2>
       <div class="grid">
-        <div class="card"><div class="num">01</div><h3>Sledujeme OFN feedy</h3><p>Živé JSON-LD zdroje JMK obcí. Cache 20 min, soft re-warm na pozadí.</p></div>
-        <div class="card"><div class="num">02</div><h3>Klasifikujeme záměry</h3><p>Stavební / územní klíčová slova → jistota vysoká / střední + matched terms.</p></div>
-        <div class="card"><div class="num">03</div><h3>Digest &amp; alerty</h3><p>Denní digest podle obce, alerty za 24 h dle vašich preferencí, CSV export.</p></div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="squiggle"></div>
-      <h2>Funkce</h2>
-      <div class="grid">
-        <div class="card"><h3>Filtry leadů</h3><p>Obec / kraj, kategorie, jistota, datum, fulltext query.</p></div>
-        <div class="card"><h3>Karty leadů</h3><p>Hierarchie: jistota → název → obec → zdroj. Prázdné stavy s návodem.</p></div>
-        <div class="card"><h3>Export CSV</h3><p>Stažení filtrovaných leadů pro Excel / CRM jedním klikem.</p></div>
-        <div class="card"><h3>Alert prefs</h3><p>Jen vysoká jistota, vybrané obce, e-mail stub — uloženo v SQLite.</p></div>
+        <div class="card"><div class="num">01</div><h3>Vyberete oblast</h3><p>Vyberete obce / kraj, které vás zajímají.</p></div>
+        <div class="card"><div class="num">02</div><h3>Hlídáme desky</h3><p>Hlídáme úřední desky a vybereme stavební záměry.</p></div>
+        <div class="card"><div class="num">03</div><h3>Denní přehled</h3><p>Dostanete denní přehled (a upozornění, když to hoří).</p></div>
       </div>
     </section>
 
     <div class="cta-band">
       <div>
-        <h2>Připraveni na první digest?</h2>
+        <h2>Připraveni na dnešní leady?</h2>
         <p>Demo účet: libovolný e-mail + heslo <strong>demo</strong></p>
       </div>
-      <a class="btn" href="/login">Přihlásit se do appky →</a>
+      <a class="btn" href="/login">Chci dnešní leady →</a>
     </div>
   </div>
-  <footer>Zdroje: OFN JSON-LD (NKOD). Brno CC BY 4.0. DeskaRadar není oficiální produkt kraje.</footer>
+  <footer>Zdroj: úřední desky obcí JMK (otevřená data).</footer>
 </body>
 </html>
