@@ -3,8 +3,8 @@
     "mode": "fixture",
     "kraj": "Jihomoravský",
     "exportDate": "2026-09-09",
-    "sampleLabel": "Ukázková data (fixture leadů JMK)",
-    "attribution": "Zdroj: oficiální OFN JSON-LD úřední desky obcí JMK (+ KÚ JMK). Ukázkový vzorek."
+    "sampleLabel": "Ukázková data",
+    "attribution": "Zdroj: úřední desky obcí JMK (otevřená data) · ukázkový vzorek."
   },
   "feeds": [
     { "id": "brno", "name": "Brno (SMB)", "ok": true, "http": 200, "items": 532 },

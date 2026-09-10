@@ -259,7 +259,7 @@
         <div style="overflow-x:auto">
           <table>
             <thead>
-              <tr><th>Zdroj</th><th>HTTP</th><th>Položky</th><th>Stav</th><th>Poznámka</th></tr>
+              <tr><th>Zdroj</th><th>Odezva</th><th>Položky</th><th>Stav</th><th>Poznámka</th></tr>
             </thead>
             <tbody id="feedsBody"></tbody>
           </table>
@@ -521,6 +521,15 @@
       `).join("");
     }
 
+    function sanitizeNote(note) {
+      if (!note) return "";
+      const low = String(note).toLowerCase();
+      if (low.includes("fixture") || low.includes("sample")) return "";
+      if (low.includes("tls") || low.includes("verify=false") || low.includes("ca chain") || low.includes("ofn"))
+        return "Dočasná výjimka ověření certifikátu";
+      return note;
+    }
+
     async function loadFeeds() {
       const res = await api("/api/feeds");
       const feeds = await res.json();
@@ -532,7 +541,7 @@
       for (const s of list) {
         const tr = document.createElement("tr");
         const st = s.ok ? `<span class="badge ok">OK</span>` : `<span class="badge fail">FAIL</span>`;
-        const note = s.ok ? (s.tls_note || "") : (s.error || "").slice(0, 140);
+        const note = s.ok ? sanitizeNote(s.tls_note || "") : sanitizeNote((s.error || "").slice(0, 140));
         tr.innerHTML = `
           <td>${escapeHtml(s.name)}<div class="muted"><a href="${escapeAttr(s.url)}" target="_blank" rel="noopener">zdroj</a></div></td>
           <td>${s.http == null ? "—" : s.http}</td>

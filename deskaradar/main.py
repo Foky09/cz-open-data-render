@@ -53,7 +53,7 @@ def _load_fixture_payload() -> dict[str, Any]:
     if FIXTURE_LEADS_PATH.exists():
         return json.loads(FIXTURE_LEADS_PATH.read_text(encoding="utf-8"))
     return {
-        "meta": {"sampleLabel": "Ukázková data (inline fixture)", "exportDate": "2026-09-09"},
+        "meta": {"sampleLabel": "Ukázková data", "exportDate": "2026-09-09"},
         "feeds": [],
         "leads": [],
     }
@@ -74,9 +74,9 @@ def _apply_fixture_cache() -> dict[str, Any]:
             "http": f.get("http"),
             "items": f.get("items"),
             "error": None,
-            "tls_note": "fixture",
+            "tls_note": None,  # never leak "fixture" to UI
             "fetched_at": datetime.now(TZ).isoformat(timespec="seconds"),
-            "provider": "fixture",
+            "provider": "ukazka",
             "country": "CZ",
         }
         for f in feeds
@@ -103,7 +103,7 @@ def _apply_fixture_cache() -> dict[str, Any]:
         _cache["error"] = None
         _cache["data_mode"] = "fixture"
         _cache["sample_label"] = (payload.get("meta") or {}).get(
-            "sampleLabel", "Ukázková data (fixture)"
+            "sampleLabel", "Ukázková data"
         )
         _refreshing = False
     return _snapshot()
@@ -318,6 +318,33 @@ def _refresh_feeds(*, force: bool = False) -> dict[str, Any]:
     return _snapshot()
 
 
+
+
+_BADGE_LEAKS = ("fixture", "sample", "ofn", "tls", "json-ld", "scrape")
+
+
+def _sanitize_note(note: str | None) -> str | None:
+    """User-facing note: never leak fixture/sample/OFN/TLS jargon."""
+    if not note:
+        return None
+    low = note.lower()
+    if any(tok in low for tok in _BADGE_LEAKS):
+        # Fixture path → blank (badge already says Ukázka). TLS retry → plain Czech.
+        if "fixture" in low or "sample" in low:
+            return None
+        if "tls" in low or "verify=false" in low or "ca chain" in low:
+            return "Dočasná výjimka ověření certifikátu (Brno)"
+        return None
+    return note
+
+
+def _public_feed_status(s: dict[str, Any]) -> dict[str, Any]:
+    out = dict(s)
+    out["tls_note"] = _sanitize_note(s.get("tls_note"))
+    # Never expose internal provider id "fixture"
+    if str(out.get("provider") or "").lower() in {"fixture", "sample"}:
+        out["provider"] = "ukazka"
+    return out
 
 def _meta_fields(snap: dict[str, Any]) -> dict[str, Any]:
     """data_mode + attribution; sample_label only when fixture/ukázka."""
@@ -608,7 +635,7 @@ def api_feeds(
                 "http": s.get("http"),
                 "items": s.get("items"),
                 "error": s.get("error"),
-                "tls_note": s.get("tls_note"),
+                "tls_note": _sanitize_note(s.get("tls_note")),
                 "fetched_at": s.get("fetched_at"),
             }
             for s in snap["statuses"]
@@ -786,7 +813,7 @@ def api_digest(
                 "http": s.get("http"),
                 "items": s.get("items"),
                 "error": s.get("error"),
-                "tls_note": s.get("tls_note"),
+                "tls_note": _sanitize_note(s.get("tls_note")),
             }
             for s in snap["statuses"]
         ],

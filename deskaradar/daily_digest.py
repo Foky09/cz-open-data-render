@@ -288,7 +288,7 @@ def fetch_feed(feed: dict[str, Any]) -> tuple[dict[str, Any], list[dict[str, Any
             status["error"] = f"SSLError: {ssl_exc}"
             return status, []
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-        status["tls_note"] = "verify=False retry (incomplete CA chain) — residual Brno TLS blocker"
+        status["tls_note"] = "Dočasná výjimka ověření certifikátu (Brno)"
         try:
             resp = requests.get(feed["url"], headers=headers, timeout=TIMEOUT, verify=False)
             status["http"] = resp.status_code
