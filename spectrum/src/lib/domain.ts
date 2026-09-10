@@ -204,7 +204,7 @@ export function bucketFor(days: number | null): BucketId {
 
 
 function foldKey(s: string): string {
-  return s.normalize("NFD").replace(/\p{M}/gu, "");
+  return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 /** Map ČTÚ-like / Czech export headers onto canonical keys. */
 export function normalizeHeader(h: string): string {
