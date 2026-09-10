@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "mode": "fixture",
+    "sampleLabel": "Ukázková data (demo parcela + vrstvy)",
+    "exportDate": "2026-09-09",
+    "attribution": "Orientační vrstvy · bez vlastnictví KN · ČÚZK RÚIAN · VÚV · ČGS · ÚÚR"
+  },
+  "parcel": {
+    "ruian_id": "680123456",
+    "ku_name": "Brno-město",
+    "parcel_number": "1234/5",
+    "obec": "Brno",
+    "mode": "demo",
+    "source_status": "DEMO"
+  },
+  "layers": [
+    { "layer": "ruian", "status": "DEMO", "mode": "demo", "blocker": "", "titleCs": "Identita parcely (RÚIAN)" },
+    { "layer": "flood", "status": "STUB", "mode": "stub", "blocker": "", "titleCs": "Povodně (VÚV Q₁₀₀)" },
+    { "layer": "radon", "status": "STUB", "mode": "stub", "blocker": "", "titleCs": "Radon (ČGS 1:50k)" },
+    { "layer": "poddolovani", "status": "STUB", "mode": "stub", "blocker": "", "titleCs": "Poddolování (ČGS)" },
+    { "layer": "svahy", "status": "STUB", "mode": "stub", "blocker": "", "titleCs": "Sesuvy / svahy (ČGS)" },
+    { "layer": "zoning", "status": "STUB", "mode": "stub", "blocker": "", "titleCs": "Územní plán (ÚÚR)" }
+  ]
+}

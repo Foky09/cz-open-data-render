@@ -42,6 +42,73 @@ APP_DIR = Path(__file__).resolve().parent
 STATIC = APP_DIR / "static"
 DATA_DIR = APP_DIR / "data"
 DB_PATH = DATA_DIR / "deskaradar.db"
+FIXTURE_LEADS_PATH = DATA_DIR / "fixtures" / "leads-fixture.json"
+ATTRIBUTION_CS = (
+    "Zdroj: oficiální OFN JSON-LD úřední desky obcí JMK (+ KÚ) · Brno CC BY 4.0 (MMB). "
+    "Bez scrape eDesky HTML."
+)
+
+
+def _load_fixture_payload() -> dict[str, Any]:
+    """CI / offline sample leads — clearly labeled fixture."""
+    if FIXTURE_LEADS_PATH.exists():
+        return json.loads(FIXTURE_LEADS_PATH.read_text(encoding="utf-8"))
+    return {
+        "meta": {"sampleLabel": "Ukázková data (inline fixture)", "exportDate": "2026-09-09"},
+        "feeds": [],
+        "leads": [],
+    }
+
+
+def _apply_fixture_cache() -> dict[str, Any]:
+    """Load fixture into cache; sets data_mode=fixture."""
+    global _refreshing
+    payload = _load_fixture_payload()
+    feeds = payload.get("feeds") or []
+    leads_raw = payload.get("leads") or []
+    statuses = [
+        {
+            "id": f.get("id"),
+            "name": f.get("name"),
+            "url": "",
+            "ok": bool(f.get("ok", True)),
+            "http": f.get("http"),
+            "items": f.get("items"),
+            "error": None,
+            "tls_note": "fixture",
+            "fetched_at": datetime.now(TZ).isoformat(timespec="seconds"),
+            "provider": "fixture",
+            "country": "CZ",
+        }
+        for f in feeds
+    ]
+    leads = []
+    for L in leads_raw:
+        leads.append(
+            {
+                "id": L.get("id"),
+                "title": L.get("title"),
+                "municipality": L.get("municipality"),
+                "category": L.get("category"),
+                "confidence": L.get("confidence"),
+                "posted": L.get("posted"),
+                "url": L.get("url"),
+                "label": "stavebni_zamer",
+            }
+        )
+    with _lock:
+        _cache["fetched_at"] = _now_utc()
+        _cache["statuses"] = statuses
+        _cache["leads"] = leads
+        _cache["notices_count"] = len(leads)
+        _cache["error"] = None
+        _cache["data_mode"] = "fixture"
+        _cache["sample_label"] = (payload.get("meta") or {}).get(
+            "sampleLabel", "Ukázková data (fixture)"
+        )
+        _refreshing = False
+    return _snapshot()
+
 
 # Demo auth — any email + password "demo" OR hardcoded pair
 DEMO_EMAIL = "demo@deskaradar.local"
@@ -52,7 +119,7 @@ SESSION_TTL_S = 7 * 24 * 3600
 app = FastAPI(title="DeskaRadar", version="0.3.0")
 app.mount("/static", StaticFiles(directory=str(STATIC)), name="static")
 
-_lock = threading.Lock()
+_lock = threading.RLock()  # reentrant: _refresh_feeds early-returns call _snapshot under the same lock
 _sessions: dict[str, dict[str, Any]] = {}
 _cache: dict[str, Any] = {
     "fetched_at": None,
@@ -60,6 +127,8 @@ _cache: dict[str, Any] = {
     "leads": [],
     "notices_count": 0,
     "error": None,
+    "data_mode": None,  # "fixture" | "live"
+    "sample_label": None,
 }
 _refreshing = False
 _last_force: float = 0.0
@@ -225,6 +294,8 @@ def _refresh_feeds(*, force: bool = False) -> dict[str, Any]:
             _cache["leads"] = leads
             _cache["notices_count"] = len(all_notices)
             _cache["error"] = None
+            _cache["data_mode"] = "live"
+            _cache["sample_label"] = "Živá data OFN JMK"
     except Exception as exc:  # noqa: BLE001
         with _lock:
             _cache["error"] = f"{type(exc).__name__}: {exc}"
@@ -233,6 +304,13 @@ def _refresh_feeds(*, force: bool = False) -> dict[str, Any]:
                 _cache["leads"] = []
                 _cache["notices_count"] = 0
                 _cache["fetched_at"] = _now_utc()
+                _cache["data_mode"] = None
+        # Offline / network blocker → serve clearly labeled fixture
+        if not _cache.get("leads"):
+            try:
+                return _apply_fixture_cache()
+            except Exception:
+                pass
     finally:
         with _lock:
             _refreshing = False
@@ -257,6 +335,9 @@ def _snapshot() -> dict[str, Any]:
             "rewarm_interval_s": REWARM_INTERVAL_S,
             "ui_soft_refresh_s": UI_SOFT_REFRESH_S,
             "providers": [p.describe() for p in list_providers()],
+            "data_mode": _cache.get("data_mode"),
+            "sample_label": _cache.get("sample_label"),
+            "attribution": ATTRIBUTION_CS,
         }
 
 
@@ -481,6 +562,9 @@ def api_health():
         "leads": len(snap["leads"]),
         "providers": snap["providers"],
         "error": snap["error"],
+        "data_mode": snap.get("data_mode"),
+        "sample_label": snap.get("sample_label"),
+        "attribution": snap.get("attribution"),
     }
 
 
@@ -565,6 +649,9 @@ def api_leads(
         "categories": cats,
         "leads": [_lead_public(L) for L in filtered],
         "error": snap["error"],
+        "data_mode": snap.get("data_mode"),
+        "sample_label": snap.get("sample_label"),
+        "attribution": snap.get("attribution"),
     }
 
 
@@ -765,12 +852,22 @@ def api_providers(dr_session: str | None = Cookie(default=None, alias=SESSION_CO
 
 
 @app.post("/api/refresh")
-def api_refresh(dr_session: str | None = Cookie(default=None, alias=SESSION_COOKIE)):
+def api_refresh(
+    mode: str = Query("live", description="live | fixture"),
+    dr_session: str | None = Cookie(default=None, alias=SESSION_COOKIE),
+):
     if not _require_user(dr_session):
         return _auth_error()
-    snap = _refresh_feeds(force=True)
+    m = (mode or "live").strip().lower()
+    if m in ("fixture", "sample", "demo", "ukazka"):
+        snap = _apply_fixture_cache()
+    else:
+        snap = _refresh_feeds(force=True)
     return {
         "ok": True,
+        "data_mode": snap.get("data_mode"),
+        "sample_label": snap.get("sample_label"),
+        "attribution": snap.get("attribution"),
         "fetched_at_pt": snap["fetched_at_pt"],
         "leads": len(snap["leads"]),
         "feeds_ok": sum(1 for s in snap["statuses"] if s.get("ok")),

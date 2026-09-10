@@ -272,24 +272,35 @@ def fetch_feed(feed: dict[str, Any]) -> tuple[dict[str, Any], list[dict[str, Any
         "tls_note": None,
     }
     headers = {"User-Agent": USER_AGENT, "Accept": "application/ld+json, application/json, */*"}
-    verify = True
-    if feed.get("tls_insecure"):
-        # Brno: incomplete certificate chain from research egress (day1-feeds.md).
-        # Prefer fixing trust store in prod; verify=False is a temporary workaround.
-        verify = False
-        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-        status["tls_note"] = "verify=False (incomplete CA chain)"
-
+    # Prefer system/CA bundle verify. Brno may need a one-shot insecure retry
+    # (incomplete intermediate CA from some egresses — day1-feeds.md).
     try:
-        resp = requests.get(feed["url"], headers=headers, timeout=TIMEOUT, verify=verify)
+        resp = requests.get(feed["url"], headers=headers, timeout=TIMEOUT, verify=True)
         status["http"] = resp.status_code
         resp.raise_for_status()
-        # Some servers omit charset; requests usually detects UTF-8 JSON.
         data = resp.json()
         notices = parse_informace(data, feed["name"])
         status["ok"] = True
         status["items"] = len(notices)
         return status, notices
+    except requests.exceptions.SSLError as ssl_exc:
+        if not feed.get("tls_insecure"):
+            status["error"] = f"SSLError: {ssl_exc}"
+            return status, []
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+        status["tls_note"] = "verify=False retry (incomplete CA chain) — residual Brno TLS blocker"
+        try:
+            resp = requests.get(feed["url"], headers=headers, timeout=TIMEOUT, verify=False)
+            status["http"] = resp.status_code
+            resp.raise_for_status()
+            data = resp.json()
+            notices = parse_informace(data, feed["name"])
+            status["ok"] = True
+            status["items"] = len(notices)
+            return status, notices
+        except Exception as exc:  # noqa: BLE001
+            status["error"] = f"{type(exc).__name__}: {exc}"
+            return status, []
     except Exception as exc:  # noqa: BLE001 — isolate per-feed failures
         status["error"] = f"{type(exc).__name__}: {exc}"
         return status, []

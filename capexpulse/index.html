@@ -103,6 +103,10 @@
         </select>
       </label>
       <button type="button" class="secondary" id="btn-clear">Reset filtrů</button>
+
+      <button type="button" class="secondary" id="btn-refresh">Obnovit</button>
+      <span id="data-badge" class="pill" style="align-self:end;margin-bottom:.15rem;background:#EEF2FF;border:1px solid #C7D2FE;font-weight:700">Ukázková data</span>
+
     </div>
     <div class="table-wrap">
       <table>
@@ -211,18 +215,26 @@
       el.hidden = !el.hidden;
     });
 
-    fetch('/data/movers-2026006.json')
-      .then(r => r.json())
-      .then(data => {
-        payload = data;
-        const m = data.meta || {};
-        document.getElementById('subtitle').textContent =
-          `ICT rozpočty · tento běh · ${m.period || ''} vs ${m.prevPeriod || ''} · položka ${m.budgetLineCode || '6125'}`;
-        render();
-      })
-      .catch(err => {
-        document.getElementById('subtitle').textContent = 'Nepodařilo se načíst movers JSON: ' + err;
-      });
+    function loadMovers() {
+      const badge = document.getElementById('data-badge');
+      if (badge) badge.textContent = 'Načítám…';
+      return fetch('/data/movers-2026006.json?ts=' + Date.now())
+        .then(r => r.json())
+        .then(data => {
+          payload = data;
+          const m = data.meta || {};
+          document.getElementById('subtitle').textContent =
+            `Ukázková data (MONITOR vzorek) · ICT · ${m.period || ''} vs ${m.prevPeriod || ''} · položka ${m.budgetLineCode || '6125'}`;
+          if (badge) badge.textContent = 'Ukázková data';
+          render();
+        })
+        .catch(err => {
+          document.getElementById('subtitle').textContent = 'Nepodařilo se načíst movers JSON: ' + err;
+          if (badge) badge.textContent = 'Chyba načtení';
+        });
+    }
+    document.getElementById('btn-refresh')?.addEventListener('click', () => { loadMovers(); });
+    loadMovers();
   </script>
 </body>
 </html>

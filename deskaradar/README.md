@@ -76,3 +76,14 @@ Brno uses `tls_insecure` (incomplete CA chain) as in Day-1 research.
 ## Attribution
 
 Brno CC BY 4.0 (MMB). Other feeds per NKOD / OFN. Deep-link `url` is source of truth.
+
+
+## Fixture vs live
+
+| Path | How | Label |
+|------|-----|-------|
+| **Fixture** | UI „Ukázková data“ → `POST /api/refresh?mode=fixture` · `data/fixtures/leads-fixture.json` | ukázková data |
+| **Live OFN** | UI „Obnovit živá data“ → `POST /api/refresh?mode=live` · `CzOfnProvider` / `daily_digest.py` | živá OFN |
+| **Digest CLI** | `python3 daily_digest.py` | writes `digests/YYYY-MM-DD-jmk.md` |
+
+No eDesky HTML scrape. Connector id `ofn-jmk` in `@od/connectors` — see CONNECTIVITY.md.

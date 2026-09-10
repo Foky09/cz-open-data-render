@@ -4,8 +4,11 @@
 <section class="card">
   <div class="row">
     <h1>Status partnerů</h1>
-    <form method="post" action="/alerts/run"><button type="submit">Poslat zkušební e-mail</button></form>
+    <form method="post" action="/alerts/run"><button type="submit">Poslat zkušební e-mail / obnovit</button></form>
   </div>
+  {% if data_label %}
+  <p class="muted" style="margin-top:0"><span class="pill ok">{{ data_label }}</span> · jeden klik obnoví statusy z nejnovějšího VISOH2 snapshotu</p>
+  {% endif %}
   <div class="kpi-row">
     <div class="kpi"><div class="v">{{ rows|length }}</div><div class="l">Na watchlistu</div></div>
     <div class="kpi"><div class="v">{{ rows|map(attribute='wasteCodeCount')|sum }}</div><div class="l">Σ kódů odpadu</div></div>

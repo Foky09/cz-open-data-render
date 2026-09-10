@@ -151,7 +151,9 @@
     </nav>
     <div class="userbar">
       <span class="meta" id="userEmail"></span>
-      <button type="button" class="btn secondary" id="btnRefresh" style="padding:.35rem .65rem;font-size:.8rem" title="Obnovit zdroje">Obnovit</button>
+      <span class="meta" id="dataModeBadge" title="Režim dat"></span>
+      <button type="button" class="btn secondary" id="btnFixture" style="padding:.35rem .65rem;font-size:.8rem" title="Načíst ukázková data">Ukázková data</button>
+      <button type="button" class="btn secondary" id="btnRefresh" style="padding:.35rem .65rem;font-size:.8rem" title="Obnovit živá OFN data">Obnovit živá data</button>
       <button type="button" class="btn secondary" id="btnLogout" style="padding:.35rem .65rem;font-size:.8rem">Odhlásit</button>
     </div>
   </header>
@@ -270,7 +272,8 @@
     </div>
 
     <footer id="appFooter">
-      JMK úřední desky · Brno CC BY 4.0 (MMB). Obnova UI každých <span id="softRefreshLabel">3</span> min.
+      <span id="attrLine">Zdroj: oficiální OFN JSON-LD úřední desky obcí JMK (+ KÚ) · Brno CC BY 4.0 (MMB). Bez scrape eDesky HTML.</span>
+      Obnova UI každých <span id="softRefreshLabel">3</span> min.
     </footer>
   </main>
 
@@ -331,7 +334,16 @@
       const ttl = meta.cache_ttl_s ?? 1200;
       const softMin = Math.round((meta.ui_soft_refresh_s || softRefreshMs / 1000) / 60);
       const rewarmMin = Math.round((meta.rewarm_interval_s || 300) / 60);
+      const mode = meta.data_mode === "fixture" ? "ukázková data" : (meta.data_mode === "live" ? "živá OFN" : "");
+      const badge = $("dataModeBadge");
+      if (badge) {
+        badge.textContent = mode || "";
+        badge.style.fontWeight = "700";
+        badge.style.color = meta.data_mode === "live" ? "#166534" : "#92400e";
+      }
+      if (meta.attribution && $("attrLine")) $("attrLine").textContent = meta.attribution;
       hint.textContent =
+        (mode ? mode + " · " : "") +
         (meta.fresh ? "aktuální" : "obnovuji…") +
         ` · automatická obnova každých ${softMin} min`;
       if (meta.ui_soft_refresh_s) {
@@ -375,14 +387,20 @@
       const params = leadsQueryParams();
       window.location.href = "/api/leads.csv?" + params.toString();
     });
-    $("btnRefresh").addEventListener("click", async () => {
+    async function doRefresh(mode) {
       $("btnRefresh").disabled = true;
-      $("cacheStamp").textContent = "Obnovuji zdroje…";
+      if ($("btnFixture")) $("btnFixture").disabled = true;
+      $("cacheStamp").textContent = mode === "fixture" ? "Načítám ukázková data…" : "Obnovuji živá OFN…";
       $("cacheStamp").classList.add("stale");
-      try { await api("/api/refresh", { method: "POST" }); } catch (_) {}
+      try {
+        await api("/api/refresh?mode=" + encodeURIComponent(mode), { method: "POST" });
+      } catch (_) {}
       await Promise.all([loadLeads(), loadFeeds(), loadAlerts()]);
       $("btnRefresh").disabled = false;
-    });
+      if ($("btnFixture")) $("btnFixture").disabled = false;
+    }
+    $("btnRefresh").addEventListener("click", () => { void doRefresh("live"); });
+    if ($("btnFixture")) $("btnFixture").addEventListener("click", () => { void doRefresh("fixture"); });
 
     function fillSelect(sel, items, keep) {
       const cur = keep ?? sel.value;

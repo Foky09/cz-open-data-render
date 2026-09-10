@@ -22,8 +22,29 @@ DATA = ROOT / "data"
 STORE_PATH = DATA / "store.json"
 OUTBOX = DATA / "outbox"
 DAY1 = ROOT / "day1"
-SNAPSHOT = DAY1 / "snapshots" / "2026-09-08.jsonl"
+# Prefer workspace Day-1 snapshots (live normalize), then local day1/
+_SNAPSHOT_CANDIDATES = [
+    Path("/workspace/wastegate/day1/snapshots"),
+    DAY1 / "snapshots",
+]
 WATCHLIST_YAML = DAY1 / "watchlist.example.yaml"
+if not WATCHLIST_YAML.exists():
+    WATCHLIST_YAML = Path("/workspace/wastegate/day1/watchlist.example.yaml")
+
+
+def resolve_snapshot() -> Path | None:
+    """Newest YYYY-MM-DD.jsonl across known snapshot dirs."""
+    best: Path | None = None
+    for d in _SNAPSHOT_CANDIDATES:
+        if not d.is_dir():
+            continue
+        for p in d.glob("????-??-??.jsonl"):
+            if best is None or p.name > best.name:
+                best = p
+    return best
+
+
+SNAPSHOT = resolve_snapshot() or (DAY1 / "snapshots" / "2026-09-08.jsonl")
 FOOTER = (
     "Zdroj: MŽP ČR – VISOH2 Registr zařízení (veřejný denní export). "
     "MŽP produkt nepodporuje. Data mohou obsahovat osobní údaje."
@@ -144,9 +165,10 @@ def infer_kind(local_id: str) -> str:
 def lookup_statuses(local_ids: list[str], country: str = "CZ") -> dict[str, dict[str, Any]]:
     wanted = {i.upper() for i in local_ids}
     out: dict[str, dict[str, Any]] = {}
-    if not SNAPSHOT.exists():
+    snap = resolve_snapshot() or SNAPSHOT
+    if not snap or not Path(snap).exists():
         return out
-    with SNAPSHOT.open(encoding="utf-8") as fh:
+    with Path(snap).open(encoding="utf-8") as fh:
         for line in fh:
             line = line.strip()
             if not line:
@@ -344,7 +366,7 @@ def dashboard(request: Request):
         st = status_by.get(w["localId"].upper(), {})
         rows.append({**w, "status": st.get("status", "—"), "operatorIco": st.get("operatorIco"),
                      "wasteCodeCount": st.get("wasteCodeCount", 0), "changeSummary": st.get("changeSummary")})
-    return templates.TemplateResponse(request, "dashboard.html", {"user": user, "rows": rows})
+    return templates.TemplateResponse(request, "dashboard.html", {"user": user, "rows": rows, "data_label": ("Živý snapshot VISOH2 · " + resolve_snapshot().name) if resolve_snapshot() else "Snapshot chybí", "data_source": "live" if resolve_snapshot() else "missing"})
 
 
 @app.get("/watchlist", response_class=HTMLResponse)
@@ -511,7 +533,14 @@ def healthz():
 
 @app.get("/health")
 def health():
-    return {"ok": True, "product": "WasteGate"}
+    snap = resolve_snapshot()
+    return {
+        "ok": True,
+        "product": "WasteGate",
+        "snapshot": str(snap) if snap else None,
+        "dataLabel": "live-snapshot" if snap else "missing-snapshot",
+        "attribution": FOOTER,
+    }
 
 if __name__ == "__main__":
     import uvicorn

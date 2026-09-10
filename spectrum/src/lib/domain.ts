@@ -202,8 +202,59 @@ export function bucketFor(days: number | null): BucketId {
   return "later";
 }
 
+
+function foldKey(s: string): string {
+  return s.normalize("NFD").replace(/\p{M}/gu, "");
+}
+/** Map ČTÚ-like / Czech export headers onto canonical keys. */
 export function normalizeHeader(h: string): string {
-  return h.trim().toLowerCase().replace(/ /g, "_");
+  const raw = h
+    .trim()
+    .toLowerCase()
+    .normalize("NFKC")
+    .replace(/^\uFEFF/, "")
+    .replace(/[\s\-]+/g, "_")
+    .replace(/_+/g, "_");
+  const aliases: Record<string, string> = {
+    konec_platnosti: "valid_to",
+    platnost_do: "valid_to",
+    platnost_konec: "valid_to",
+    platny_do: "valid_to",
+    platný_do: "valid_to",
+    validto: "valid_to",
+    valid_until: "valid_to",
+    expiry: "valid_to",
+    expires: "valid_to",
+    expiry_date: "valid_to",
+    date_to: "valid_to",
+    do: "valid_to",
+    konec: "valid_to",
+    ochrana_do: "protected_to",
+    protectedto: "protected_to",
+    protected_until: "protected_to",
+    volaci_znak: "callsign",
+    volací_znak: "callsign",
+    znacka: "callsign",
+    značka: "callsign",
+    station_id: "callsign",
+    station_callsign: "callsign",
+    id_stanice: "callsign",
+    nazev: "name",
+    název: "name",
+    station_name: "name",
+    nazev_stanice: "name",
+    frekvence: "frequency_mhz",
+    frequency: "frequency_mhz",
+    freq: "frequency_mhz",
+    mhz: "frequency_mhz",
+    registrovano: "registered_at",
+    registrováno: "registered_at",
+    registered: "registered_at",
+    aktualizovano: "updated_at",
+    aktualizováno: "updated_at",
+    updated: "updated_at",
+  };
+  return aliases[raw] ?? aliases[foldKey(raw)] ?? raw;
 }
 
 /** Enrich normalized stations into calendar rows (buckets, days, actionable). */
@@ -291,17 +342,18 @@ export function buildAlertsPayload(
 
 export function parseCsvText(text: string): Record<string, unknown>[] {
   const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/).filter((l) => l.trim() !== "");
-  if (lines.length === 0) throw new Error("CSV je prázdný. Nahrajte export stanic z ČTÚ.");
-  const headers = parseCsvLine(lines[0]).map(normalizeHeader);
-  if (!headers.length) throw new Error("CSV nemá hlavičku");
+  if (lines.length === 0) throw new Error("CSV je prázdný. Nahrajte export stanic z ČTÚ (CSV/XLSX).");
+  const delim = detectCsvDelimiter(lines[0]);
+  const headers = parseCsvLine(lines[0], delim).map(normalizeHeader);
+  if (!headers.length) throw new Error("CSV nemá hlavičku. Očekáván export stanic z ČTÚ.");
   if (!headers.includes("valid_to")) {
     throw new Error(
-      "V souboru chybí datum konce platnosti. V exportu ČTÚ hledejte sloupec s koncem platnosti (někdy valid_to)."
+      "V souboru chybí datum konce platnosti. V exportu ČTÚ hledejte sloupec s koncem platnosti (např. valid_to, Konec platnosti, Platnost do)."
     );
   }
   const rows: Record<string, unknown>[] = [];
   for (let i = 1; i < lines.length; i++) {
-    const cols = parseCsvLine(lines[i]);
+    const cols = parseCsvLine(lines[i], delim);
     if (cols.every((c) => c.trim() === "")) continue;
     const row: Record<string, unknown> = {};
     headers.forEach((h, j) => {
@@ -315,7 +367,13 @@ export function parseCsvText(text: string): Record<string, unknown>[] {
   return rows;
 }
 
-function parseCsvLine(line: string): string[] {
+function detectCsvDelimiter(headerLine: string): "," | ";" {
+  const commas = parseCsvLine(headerLine, ",").length;
+  const semis = parseCsvLine(headerLine, ";").length;
+  return semis > commas ? ";" : ",";
+}
+
+function parseCsvLine(line: string, delim: "," | ";" = ","): string[] {
   const out: string[] = [];
   let cur = "";
   let inQuotes = false;
@@ -334,7 +392,7 @@ function parseCsvLine(line: string): string[] {
       }
     } else {
       if (ch === '"') inQuotes = true;
-      else if (ch === ",") {
+      else if (ch === delim) {
         out.push(cur);
         cur = "";
       } else cur += ch;

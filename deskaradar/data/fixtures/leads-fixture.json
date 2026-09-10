@@ -1,0 +1,68 @@
+{
+  "meta": {
+    "mode": "fixture",
+    "kraj": "Jihomoravský",
+    "exportDate": "2026-09-09",
+    "sampleLabel": "Ukázková data (fixture leadů JMK)",
+    "attribution": "Zdroj: oficiální OFN JSON-LD úřední desky obcí JMK (+ KÚ JMK). Ukázkový vzorek."
+  },
+  "feeds": [
+    { "id": "brno", "name": "Brno (SMB)", "ok": true, "http": 200, "items": 532 },
+    { "id": "breclav", "name": "Břeclav", "ok": true, "http": 200, "items": 192 },
+    { "id": "hodonin", "name": "Hodonín", "ok": true, "http": 200, "items": 269 },
+    { "id": "znojmo", "name": "Znojmo", "ok": true, "http": 200, "items": 275 },
+    { "id": "pohorelice", "name": "Pohořelice", "ok": true, "http": 200, "items": 28 }
+  ],
+  "leads": [
+    {
+      "id": "fixture-brno-1",
+      "title": "zrychlené povolení záměru: Stavební úpravy RD (ukázka)",
+      "municipality": "Brno (SMB)",
+      "category": "povoleni_zameru",
+      "confidence": "high",
+      "posted": "2026-09-08",
+      "url": "https://edeska.brno.cz/eDeska/opendata",
+      "country": "cz"
+    },
+    {
+      "id": "fixture-breclav-1",
+      "title": "Povolení stavby — stavební úpravy BD (ukázka)",
+      "municipality": "Břeclav",
+      "category": "stavebni_povoleni",
+      "confidence": "high",
+      "posted": "2026-09-07",
+      "url": "https://sluzby.breclav.eu/opendata/ODTURD02.json",
+      "country": "cz"
+    },
+    {
+      "id": "fixture-hodonin-1",
+      "title": "Řízení o povolení záměru — novostavba RD (ukázka)",
+      "municipality": "Hodonín",
+      "category": "povoleni_zameru",
+      "confidence": "medium",
+      "posted": "2026-09-06",
+      "url": "https://www.hodonin.eu/opendata-uredni-deska",
+      "country": "cz"
+    },
+    {
+      "id": "fixture-znojmo-1",
+      "title": "Veřejná vyhláška — zahájení územního řízení (ukázka)",
+      "municipality": "Znojmo",
+      "category": "zahajeni_rizeni",
+      "confidence": "medium",
+      "posted": "2026-09-05",
+      "url": "https://www.znojmocity.cz/opendata-uredni-deska",
+      "country": "cz"
+    },
+    {
+      "id": "fixture-pohorelice-1",
+      "title": "Povolení ve zrychleném řízení — novostavba RD (ukázka)",
+      "municipality": "Pohořelice",
+      "category": "povoleni_zameru",
+      "confidence": "high",
+      "posted": "2026-09-04",
+      "url": "https://www.pohorelice.cz/api/open-data/ofn67a4bd23b94a8",
+      "country": "cz"
+    }
+  ]
+}

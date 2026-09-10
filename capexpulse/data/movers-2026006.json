@@ -17,15 +17,11 @@
       "flag": "clean"
     },
     "amountUnit": "CZK",
-    "amountField": "ZU_ROZKZ",
     "generatedAt": "2026-09-08T17:04:56.780324+00:00",
     "adapter": {
       "id": "cz-monitor",
       "orgIdField": "IČO",
-      "budgetLineField": "ZCMMT_ITM",
-      "amountField": "ZU_ROZKZ",
-      "budgetAfterChangesField": "ZU_ROZPZM",
-      "notes": "Δ SUM(ZU_ROZKZ) by IČO vs prior period. FinM ÚSC primary, FinOSS secondary. clean = prior present AND prior rozpzm≥0 AND prior rozkz>0; new_entity = missing prior OR prior rozkz==0; suspect_negative_prior = prior rozpzm<0 OR prior rozkz<0."
+      "notes": "Δ ICT skutečnost organizace mezi obdobími (MONITOR). Flag hygieny z předchozího období."
     },
     "extensionPoints": {
       "futureCountries": [

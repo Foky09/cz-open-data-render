@@ -55,7 +55,7 @@ export function parseXlsxBuffer(buf: ArrayBuffer): Record<string, unknown>[] {
   );
   if (!headers.some((h) => h === "valid_to")) {
     throw new Error(
-      "V souboru chybí datum konce platnosti. V exportu ČTÚ hledejte sloupec s koncem platnosti (někdy valid_to)."
+      "V souboru chybí datum konce platnosti. V exportu ČTÚ hledejte sloupec s koncem platnosti (např. valid_to, Konec platnosti, Platnost do)."
     );
   }
   const rows: Record<string, unknown>[] = [];
