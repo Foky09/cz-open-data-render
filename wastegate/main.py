@@ -45,6 +45,20 @@ def resolve_snapshot() -> Path | None:
 
 
 SNAPSHOT = resolve_snapshot() or (DAY1 / "snapshots" / "2026-09-08.jsonl")
+
+
+def snapshot_label_cs(path: Path | None) -> str:
+    """Human Czech live-data label — no .jsonl / snapshot jargon."""
+    if path is None:
+        return "Data registru zatím chybí"
+    stem = path.stem  # YYYY-MM-DD
+    try:
+        d = datetime.strptime(stem, "%Y-%m-%d").date()
+        stamp = f"{d.day}. {d.month}. {d.year}"
+    except ValueError:
+        stamp = stem
+    return f"Živá data z registru · aktualizováno {stamp}"
+
 FOOTER = (
     "Zdroj: MŽP ČR – VISOH2 Registr zařízení (veřejný denní export). "
     "MŽP produkt nepodporuje. Data mohou obsahovat osobní údaje."
@@ -366,7 +380,17 @@ def dashboard(request: Request):
         st = status_by.get(w["localId"].upper(), {})
         rows.append({**w, "status": st.get("status", "—"), "operatorIco": st.get("operatorIco"),
                      "wasteCodeCount": st.get("wasteCodeCount", 0), "changeSummary": st.get("changeSummary")})
-    return templates.TemplateResponse(request, "dashboard.html", {"user": user, "rows": rows, "data_label": ("Živý snapshot VISOH2 · " + resolve_snapshot().name) if resolve_snapshot() else "Snapshot chybí", "data_source": "live" if resolve_snapshot() else "missing"})
+    snap = resolve_snapshot()
+    return templates.TemplateResponse(
+        request,
+        "dashboard.html",
+        {
+            "user": user,
+            "rows": rows,
+            "data_label": snapshot_label_cs(snap),
+            "data_source": "live" if snap else "missing",
+        },
+    )
 
 
 @app.get("/watchlist", response_class=HTMLResponse)

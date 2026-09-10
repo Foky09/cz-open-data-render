@@ -44,7 +44,7 @@ DATA_DIR = APP_DIR / "data"
 DB_PATH = DATA_DIR / "deskaradar.db"
 FIXTURE_LEADS_PATH = DATA_DIR / "fixtures" / "leads-fixture.json"
 ATTRIBUTION_CS = (
-    "Zdroj: úřední desky JMK (+ KÚ) · Brno CC BY 4.0 (MMB)."
+    "Zdroj: úřední desky obcí JMK (otevřená data) · Brno CC BY 4.0 (MMB)."
 )
 
 

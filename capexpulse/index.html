@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CapexPulse — ICT capex movers</title>
+  <title>CapexPulse — týdenní ICT signály</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -229,7 +229,7 @@
           render();
         })
         .catch(err => {
-          document.getElementById('subtitle').textContent = 'Nepodařilo se načíst movers JSON: ' + err;
+          document.getElementById('subtitle').textContent = 'Nepodařilo se načíst data: ' + err;
           if (badge) badge.textContent = 'Chyba načtení';
         });
     }
