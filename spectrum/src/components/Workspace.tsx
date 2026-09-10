@@ -50,7 +50,16 @@ function EmptyIllu() {
   );
 }
 
-function StationTable({ rows, empty }: { rows: StationRow[]; empty?: string }) {
+function StationTable({
+  rows,
+  empty,
+  showValidity = false,
+}: {
+  rows: StationRow[];
+  empty?: string;
+  /** Fixture/ukázka may show valid_to; happy path (upload) must not. */
+  showValidity?: boolean;
+}) {
   if (!rows.length) {
     return <p className="muted empty-hint">{empty ?? "Žádné stanice v tomto bucketu."}</p>;
   }
@@ -62,9 +71,13 @@ function StationTable({ rows, empty }: { rows: StationRow[]; empty?: string }) {
             <th>Volací znak</th>
             <th>Název</th>
             <th>Frekvence</th>
-            <th>Konec platnosti</th>
-            <th>Dní</th>
-            <th>Ochrana do</th>
+            {showValidity ? (
+              <>
+                <th>Konec platnosti</th>
+                <th>Dní</th>
+                <th>Ochrana do</th>
+              </>
+            ) : null}
             <th>Horizont</th>
             <th>Akce</th>
           </tr>
@@ -80,9 +93,13 @@ function StationTable({ rows, empty }: { rows: StationRow[]; empty?: string }) {
               </td>
               <td>{s.name}</td>
               <td>{s.frequency_mhz}</td>
-              <td>{s.valid_to_date ?? "—"}</td>
-              <td>{s.days_to_valid_to ?? "—"}</td>
-              <td>{s.protected_to_date ?? "—"}</td>
+              {showValidity ? (
+                <>
+                  <td>{s.valid_to_date ?? "—"}</td>
+                  <td>{s.days_to_valid_to ?? "—"}</td>
+                  <td>{s.protected_to_date ?? "—"}</td>
+                </>
+              ) : null}
               <td>
                 <span className={`bucket-tag ${s.valid_bucket}`}>
                   {BUCKET_LABELS_CS[s.valid_bucket]}
@@ -113,6 +130,7 @@ export default function Workspace() {
   const [busyLabel, setBusyLabel] = useState("Načítám…");
   const [dragOver, setDragOver] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const [fromSample, setFromSample] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -134,8 +152,9 @@ export default function Workspace() {
     toastTimer.current = setTimeout(() => setToast(null), 6000);
   }, []);
 
-  const applyRows = useCallback((rows: Record<string, unknown>[]) => {
+  const applyRows = useCallback((rows: Record<string, unknown>[], sample = false) => {
     const result = rowsToAlerts(rows);
+    setFromSample(sample);
     setPayload(result);
     saveResult(result);
     setError(null);
@@ -150,7 +169,7 @@ export default function Workspace() {
       setError(null);
       try {
         const rows = await parseUploadedFile(file);
-        applyRows(rows);
+        applyRows(rows, false);
       } catch (e) {
         const msg = (e as Error).message || "Chyba při načítání souboru";
         setError(msg);
@@ -169,7 +188,7 @@ export default function Workspace() {
     setError(null);
     try {
       const rows = await loadSampleCsv();
-      applyRows(rows);
+      applyRows(rows, true);
     } catch (e) {
       const msg = (e as Error).message || "Chyba při načítání ukázky";
       setError(msg);
@@ -292,6 +311,7 @@ export default function Workspace() {
             onClick={() => {
               clearResult();
               setPayload(null);
+              setFromSample(false);
               setError(null);
             }}
             disabled={busy}
@@ -378,6 +398,7 @@ export default function Workspace() {
               <StationTable
                 rows={payload.actionable}
                 empty="Nic k obnově v horizontu 30 dní. Když nahráte soubor, „obnovit teď“ se objeví tady."
+                showValidity={fromSample}
               />
             </div>
           </section>
@@ -392,7 +413,7 @@ export default function Workspace() {
                 <span className="muted">{byBucket[b].length} stanic</span>
               </div>
               <div className="card">
-                <StationTable rows={byBucket[b]} />
+                <StationTable rows={byBucket[b]} showValidity={fromSample} />
               </div>
             </section>
           ))}

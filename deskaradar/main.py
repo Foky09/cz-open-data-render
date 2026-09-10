@@ -295,7 +295,8 @@ def _refresh_feeds(*, force: bool = False) -> dict[str, Any]:
             _cache["notices_count"] = len(all_notices)
             _cache["error"] = None
             _cache["data_mode"] = "live"
-            _cache["sample_label"] = "Živá data OFN JMK"
+            # Platform contract: omit sample_label on real live ingest
+            _cache["sample_label"] = None
     except Exception as exc:  # noqa: BLE001
         with _lock:
             _cache["error"] = f"{type(exc).__name__}: {exc}"
@@ -318,10 +319,22 @@ def _refresh_feeds(*, force: bool = False) -> dict[str, Any]:
     return _snapshot()
 
 
+
+def _meta_fields(snap: dict[str, Any]) -> dict[str, Any]:
+    """data_mode + attribution; sample_label only when fixture/ukázka."""
+    out: dict[str, Any] = {
+        "data_mode": snap.get("data_mode"),
+        "attribution": snap.get("attribution"),
+    }
+    sl = snap.get("sample_label")
+    if sl:
+        out["sample_label"] = sl
+    return out
+
 def _snapshot() -> dict[str, Any]:
     with _lock:
         fa = _cache.get("fetched_at")
-        return {
+        out: dict[str, Any] = {
             "fetched_at": fa.isoformat() if fa else None,
             "fetched_at_pt": fa.astimezone(TZ).strftime("%Y-%m-%d %H:%M:%S %Z") if fa else None,
             "cache_ttl_s": CACHE_TTL_S,
@@ -336,9 +349,14 @@ def _snapshot() -> dict[str, Any]:
             "ui_soft_refresh_s": UI_SOFT_REFRESH_S,
             "providers": [p.describe() for p in list_providers()],
             "data_mode": _cache.get("data_mode"),
-            "sample_label": _cache.get("sample_label"),
             "attribution": ATTRIBUTION_CS,
         }
+        # Fixture/ukázka only — omit key entirely on live
+        sl = _cache.get("sample_label")
+        if sl:
+            out["sample_label"] = sl
+        return out
+
 
 
 def _ensure_data(*, force: bool = False) -> dict[str, Any]:
@@ -562,9 +580,7 @@ def api_health():
         "leads": len(snap["leads"]),
         "providers": snap["providers"],
         "error": snap["error"],
-        "data_mode": snap.get("data_mode"),
-        "sample_label": snap.get("sample_label"),
-        "attribution": snap.get("attribution"),
+        **_meta_fields(snap),
     }
 
 
@@ -649,9 +665,7 @@ def api_leads(
         "categories": cats,
         "leads": [_lead_public(L) for L in filtered],
         "error": snap["error"],
-        "data_mode": snap.get("data_mode"),
-        "sample_label": snap.get("sample_label"),
-        "attribution": snap.get("attribution"),
+        **_meta_fields(snap),
     }
 
 
@@ -865,9 +879,7 @@ def api_refresh(
         snap = _refresh_feeds(force=True)
     return {
         "ok": True,
-        "data_mode": snap.get("data_mode"),
-        "sample_label": snap.get("sample_label"),
-        "attribution": snap.get("attribution"),
+        **_meta_fields(snap),
         "fetched_at_pt": snap["fetched_at_pt"],
         "leads": len(snap["leads"]),
         "feeds_ok": sum(1 for s in snap["statuses"] if s.get("ok")),
