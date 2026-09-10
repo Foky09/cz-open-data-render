@@ -44,8 +44,7 @@ DATA_DIR = APP_DIR / "data"
 DB_PATH = DATA_DIR / "deskaradar.db"
 FIXTURE_LEADS_PATH = DATA_DIR / "fixtures" / "leads-fixture.json"
 ATTRIBUTION_CS = (
-    "Zdroj: oficiální OFN JSON-LD úřední desky obcí JMK (+ KÚ) · Brno CC BY 4.0 (MMB). "
-    "Bez scrape eDesky HTML."
+    "Zdroj: úřední desky JMK (+ KÚ) · Brno CC BY 4.0 (MMB)."
 )
 
 
