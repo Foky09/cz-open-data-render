@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import shutil
 import subprocess
 from pathlib import Path
@@ -10,10 +11,11 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from app.models import SitePack
 
+log = logging.getLogger("sitepack.render")
+
 ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE_DIR = ROOT / "templates"
 OUTPUT_DIR = ROOT / "output"
-SAMPLE_HTML = Path("/workspace/sitepack/sample/sitepack-pro-ukazka.html")
 
 
 def _env() -> Environment:
@@ -62,11 +64,21 @@ def html_to_pdf(html_path: Path, pdf_path: Path | None = None) -> Path:
     return pdf_path
 
 
-def generate_pack_files(pack: SitePack, stem: str | None = None) -> tuple[Path, Path]:
+def generate_pack_files(pack: SitePack, stem: str | None = None) -> tuple[Path, Path | None]:
+    """Write HTML always; PDF when Chrome is available (optional on Render)."""
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     stem = stem or f"sitepack-{pack.parcel.ruian_id or 'pack'}"
     html_path = OUTPUT_DIR / f"{stem}.html"
     pdf_path = OUTPUT_DIR / f"{stem}.pdf"
     write_html(pack, html_path)
-    html_to_pdf(html_path, pdf_path)
-    return html_path.resolve(), pdf_path.resolve()
+    try:
+        html_to_pdf(html_path, pdf_path)
+        return html_path.resolve(), pdf_path.resolve()
+    except Exception as exc:  # noqa: BLE001 — PDF is best-effort on free Render
+        log.warning("PDF skipped (%s); HTML rešerše still available", exc)
+        if pdf_path.exists():
+            try:
+                pdf_path.unlink()
+            except OSError:
+                pass
+        return html_path.resolve(), None

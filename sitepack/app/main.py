@@ -102,19 +102,41 @@ def generate(
         demo=use_demo,
         force_live_ruian=bool(force_live_ruian),
     )
-    pack = orch.build(req)
+    try:
+        pack = orch.build(req)
+    except Exception as exc:  # noqa: BLE001
+        return templates.TemplateResponse(
+            request,
+            "saas/app.html",
+            _ctx(
+                request,
+                error=f"Rešerši se nepodařilo sestavit. Zkuste ukázku nebo to zkuste znovu. ({type(exc).__name__})",
+            ),
+            status_code=500,
+        )
     stem = f"sitepack-{pack.parcel.ruian_id or 'custom'}"
     # Avoid collisions for stub custom parcels
     if not pack.parcel.ruian_id:
         safe_ku = (ku_s or "x").replace("/", "-").replace(" ", "_")[:40]
         safe_pn = (pn or "x").replace("/", "-").replace(" ", "_")[:40]
         stem = f"sitepack-{safe_ku}-{safe_pn}"
-    html_path, pdf_path = generate_pack_files(pack, stem=stem)
+    try:
+        html_path, pdf_path = generate_pack_files(pack, stem=stem)
+    except Exception as exc:  # noqa: BLE001
+        return templates.TemplateResponse(
+            request,
+            "saas/app.html",
+            _ctx(
+                request,
+                error=f"Rešerši se nepodařilo uložit. Zkuste to znovu. ({type(exc).__name__})",
+            ),
+            status_code=500,
+        )
     meta = {
         "stem": stem,
         "pack": pack.model_dump(mode="json"),
         "html": str(html_path),
-        "pdf": str(pdf_path),
+        "pdf": str(pdf_path) if pdf_path else None,
     }
     _PACK_META[stem] = meta
     meta_path = OUTPUT / f"{stem}.meta.json"

@@ -85,7 +85,7 @@ def main(argv: list[str] | None = None) -> int:
     if not args.no_files and (args.stem or not args.json):
         html_path, pdf_path = generate_pack_files(pack, stem=args.stem)
         payload["html"] = str(html_path)
-        payload["pdf"] = str(pdf_path)
+        payload["pdf"] = str(pdf_path) if pdf_path else None
 
     if args.json:
         print(json.dumps(payload, ensure_ascii=False, indent=2))
