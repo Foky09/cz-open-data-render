@@ -94,7 +94,7 @@ def main(argv: list[str] | None = None) -> int:
         print("parcel:", pack.parcel.ku_name, pack.parcel.parcel_number, "RÚIAN", pack.parcel.ruian_id)
         if html_path:
             print("html:", html_path)
-            print("pdf:", pdf_path)
+            print("pdf:", pdf_path or "(skipped — no Chrome/PDF engine)")
         print("--- layer status ---")
         for row in pack.layer_status_table:
             print(f"  {row['layer']:12} {row['status']:10} {row.get('blocker') or ''}")

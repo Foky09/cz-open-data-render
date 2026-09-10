@@ -94,6 +94,9 @@ def generate(
             status_code=400,
         )
     use_demo = bool(demo) or (not rid and not (ku_s and pn))
+    # Ukázka stays offline-safe (fixtures); live joins only when not on demo path
+    # or user explicitly asks for živá data parcely.
+    prefer_live = (not use_demo) or bool(force_live_ruian)
     req = PackRequest(
         country="CZ",
         ruian_id=rid or None,
@@ -101,6 +104,7 @@ def generate(
         parcel_number=pn or None,
         demo=use_demo,
         force_live_ruian=bool(force_live_ruian),
+        prefer_live=prefer_live,
     )
     try:
         pack = orch.build(req)
