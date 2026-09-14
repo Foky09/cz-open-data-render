@@ -233,7 +233,8 @@
       </section>
       <section>
         <h2>Nastavení alertů</h2>
-        <p class="muted" style="margin-top:0">Uloženo k vašemu účtu. E-mailové odesílání v demu neběží — uložíte si jen preference.</p>
+        <p class="muted" style="margin-top:0">Uloženo k vašemu účtu. Při zapnutých alertech a úspěšné obnově živých dat pošleme e-mail s novými leady (posledních 24&nbsp;h, bez duplicit).</p>
+        <p class="muted" id="emailDeliveryStatus" style="margin-top:.35rem">Stav doručení: načítám…</p>
         <div class="prefs-grid">
           <label class="check"><input type="checkbox" id="pEnabled" checked /> Alerty zapnuté</label>
           <label class="check"><input type="checkbox" id="pHighOnly" checked /> Jen vysoká pravděpodobnost</label>
@@ -246,6 +247,7 @@
           </div>
           <div>
             <button type="button" class="btn" id="btnSavePrefs">Uložit nastavení</button>
+            <button type="button" class="btn" id="btnSendTestEmail" style="margin-left:.5rem;background:#fff;color:var(--text);border:1px solid var(--border)">Poslat zkušební e-mail</button>
             <span class="toast" id="prefsToast"></span>
           </div>
         </div>
@@ -334,7 +336,7 @@
       const ttl = meta.cache_ttl_s ?? 1200;
       const softMin = Math.round((meta.ui_soft_refresh_s || softRefreshMs / 1000) / 60);
       const rewarmMin = Math.round((meta.rewarm_interval_s || 300) / 60);
-      const mode = meta.data_mode === "fixture" || meta.sample_label
+      const mode = meta.data_mode === "fixture"
         ? "Ukázka"
         : (meta.data_mode === "live" ? "Živá data" : "");
       const badge = $("dataModeBadge");
@@ -370,7 +372,7 @@
         btn.classList.add("active");
         $("tab-" + btn.dataset.tab).classList.add("active");
         if (btn.dataset.tab === "digest") loadDigest();
-        if (btn.dataset.tab === "alerts") { loadAlerts(); loadPrefs(); }
+        if (btn.dataset.tab === "alerts") { loadAlerts(); loadPrefs(); loadEmailStatus(); }
         if (btn.dataset.tab === "health") loadFeeds();
       });
     });
@@ -385,6 +387,7 @@
     $("fQuery").addEventListener("keydown", (e) => { if (e.key === "Enter") loadLeads(); });
     $("btnDigest").addEventListener("click", () => loadDigest());
     $("btnSavePrefs").addEventListener("click", () => savePrefs());
+    $("btnSendTestEmail").addEventListener("click", () => sendTestEmail());
     $("btnCsv").addEventListener("click", () => {
       const params = leadsQueryParams();
       window.location.href = "/api/leads.csv?" + params.toString();
@@ -591,6 +594,53 @@
         lastMunicipalities = ld.municipalities || [];
       }
       renderMuniChecks(lastMunicipalities, p.municipalities || []);
+    }
+
+    async function loadEmailStatus() {
+      const el = $("emailDeliveryStatus");
+      if (!el) return;
+      try {
+        const res = await api("/api/alerts/status");
+        const data = await res.json();
+        if (data.email_configured) {
+          const prov = data.provider === "resend" ? "Resend" : (data.provider === "smtp" ? "SMTP" : data.provider);
+          el.textContent = `Stav doručení: nakonfigurováno (${prov}` + (data.from_email ? ` · ${data.from_email}` : "") + ").";
+          el.style.color = "#166534";
+        } else {
+          el.textContent = "Stav doručení: chybí RESEND_API_KEY (nebo SMTP_*). E-maily se neodesílají, dokud je nenastavíte na Renderu.";
+          el.style.color = "#92400e";
+        }
+      } catch (e) {
+        el.textContent = "Stav doručení: nelze ověřit.";
+      }
+    }
+
+    async function sendTestEmail() {
+      const toast = $("prefsToast");
+      toast.textContent = "Odesílám…";
+      try {
+        const munis = [...$("pMunis").querySelectorAll("input:checked")].map(i => i.value);
+        await api("/api/alert-prefs", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            enabled: $("pEnabled").checked,
+            high_only: $("pHighOnly").checked,
+            email: $("pEmail").value,
+            municipalities: munis,
+          }),
+        });
+        const res = await api("/api/alerts/send-test", { method: "POST" });
+        const data = await res.json().catch(() => ({}));
+        if (res.status === 503 || !data.ok) {
+          toast.textContent = data.error || ("Chyba " + res.status);
+        } else {
+          toast.textContent = "Zkušební e-mail odeslán" + (data.to ? (" → " + data.to) : "") + ".";
+        }
+      } catch (e) {
+        toast.textContent = "Chyba: " + e;
+      }
+      setTimeout(() => { if ($("prefsToast").textContent) $("prefsToast").textContent = ""; }, 6000);
     }
 
     async function savePrefs() {

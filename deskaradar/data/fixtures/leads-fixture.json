@@ -4,14 +4,44 @@
     "kraj": "Jihomoravský",
     "exportDate": "2026-09-09",
     "sampleLabel": "Ukázková data",
-    "attribution": "Zdroj: úřední desky obcí JMK (otevřená data) · ukázkový vzorek."
+    "attribution": "Zdroj: úřední desky obcí JMK (otevřená data) · Brno CC BY 4.0 (MMB)."
   },
   "feeds": [
-    { "id": "brno", "name": "Brno (SMB)", "ok": true, "http": 200, "items": 532 },
-    { "id": "breclav", "name": "Břeclav", "ok": true, "http": 200, "items": 192 },
-    { "id": "hodonin", "name": "Hodonín", "ok": true, "http": 200, "items": 269 },
-    { "id": "znojmo", "name": "Znojmo", "ok": true, "http": 200, "items": 275 },
-    { "id": "pohorelice", "name": "Pohořelice", "ok": true, "http": 200, "items": 28 }
+    {
+      "id": "brno",
+      "name": "Brno (SMB)",
+      "ok": true,
+      "http": 200,
+      "items": 532
+    },
+    {
+      "id": "breclav",
+      "name": "Břeclav",
+      "ok": true,
+      "http": 200,
+      "items": 192
+    },
+    {
+      "id": "hodonin",
+      "name": "Hodonín",
+      "ok": true,
+      "http": 200,
+      "items": 269
+    },
+    {
+      "id": "znojmo",
+      "name": "Znojmo",
+      "ok": true,
+      "http": 200,
+      "items": 275
+    },
+    {
+      "id": "pohorelice",
+      "name": "Pohořelice",
+      "ok": true,
+      "http": 200,
+      "items": 28
+    }
   ],
   "leads": [
     {

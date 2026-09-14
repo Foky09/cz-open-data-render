@@ -7,13 +7,19 @@ Login is a demo stub (cookie session). Alert prefs stored in SQLite.
 
 from __future__ import annotations
 
+import hashlib
 import json
+import os
 import secrets
+import smtplib
 import sqlite3
 import sys
 import threading
 import time
+import urllib.error
+import urllib.request
 from datetime import date, datetime, timedelta, timezone
+from email.message import EmailMessage
 from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
@@ -102,9 +108,8 @@ def _apply_fixture_cache() -> dict[str, Any]:
         _cache["notices_count"] = len(leads)
         _cache["error"] = None
         _cache["data_mode"] = "fixture"
-        _cache["sample_label"] = (payload.get("meta") or {}).get(
-            "sampleLabel", "Ukázková data"
-        )
+        # Always user-facing "Ukázková data" — never fixture jargon
+        _cache["sample_label"] = "Ukázková data"
         _refreshing = False
     return _snapshot()
 
@@ -154,6 +159,16 @@ def _init_db() -> None:
                 email TEXT NOT NULL DEFAULT '',
                 enabled INTEGER NOT NULL DEFAULT 1,
                 updated_at TEXT NOT NULL
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS alert_sent (
+                user_key TEXT NOT NULL,
+                lead_key TEXT NOT NULL,
+                sent_at TEXT NOT NULL,
+                PRIMARY KEY (user_key, lead_key)
             )
             """
         )
@@ -223,6 +238,260 @@ def _save_prefs(user_key: str, prefs: dict[str, Any]) -> dict[str, Any]:
         )
         conn.commit()
     return payload
+
+
+# --- Alert email (Resend preferred, SMTP fallback) ---
+
+ALERT_FROM_EMAIL = os.environ.get("ALERT_FROM_EMAIL", "alerts@deskaradar.onrender.com").strip()
+PUBLIC_APP_URL = os.environ.get("PUBLIC_APP_URL", "https://deskaradar.onrender.com").rstrip("/")
+
+
+def _email_provider() -> str | None:
+    if os.environ.get("RESEND_API_KEY", "").strip():
+        return "resend"
+    if os.environ.get("SMTP_HOST", "").strip():
+        return "smtp"
+    return None
+
+
+def _email_configured() -> bool:
+    return _email_provider() is not None
+
+
+def _lead_dedupe_key(L: dict[str, Any]) -> str:
+    raw = str(L.get("id") or "") or "|".join(
+        [
+            str(L.get("url") or ""),
+            str(L.get("municipality") or ""),
+            str(L.get("published_at") or L.get("posted") or ""),
+            str(L.get("title_redacted") or L.get("title") or ""),
+        ]
+    )
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:40]
+
+
+def _alert_was_sent(user_key: str, lead_key: str) -> bool:
+    with _db() as conn:
+        row = conn.execute(
+            "SELECT 1 FROM alert_sent WHERE user_key=? AND lead_key=?",
+            (user_key, lead_key),
+        ).fetchone()
+    return bool(row)
+
+
+def _mark_alert_sent(user_key: str, lead_key: str) -> None:
+    now = datetime.now(TZ).isoformat(timespec="seconds")
+    with _db() as conn:
+        conn.execute(
+            """
+            INSERT OR IGNORE INTO alert_sent (user_key, lead_key, sent_at)
+            VALUES (?, ?, ?)
+            """,
+            (user_key, lead_key, now),
+        )
+        conn.commit()
+
+
+def _all_alert_prefs() -> list[tuple[str, dict[str, Any]]]:
+    with _db() as conn:
+        rows = conn.execute(
+            "SELECT user_key, high_only, municipalities, email, enabled FROM alert_prefs"
+        ).fetchall()
+    out: list[tuple[str, dict[str, Any]]] = []
+    for row in rows:
+        try:
+            munis = json.loads(row["municipalities"] or "[]")
+        except json.JSONDecodeError:
+            munis = []
+        prefs = {
+            "high_only": bool(row["high_only"]),
+            "municipalities": munis if isinstance(munis, list) else [],
+            "email": row["email"] or "",
+            "enabled": bool(row["enabled"]),
+        }
+        out.append((row["user_key"], prefs))
+    return out
+
+
+def _send_via_resend(*, to: str, subject: str, text: str, html: str | None = None) -> None:
+    api_key = os.environ.get("RESEND_API_KEY", "").strip()
+    if not api_key:
+        raise RuntimeError("RESEND_API_KEY missing")
+    payload: dict[str, Any] = {
+        "from": ALERT_FROM_EMAIL,
+        "to": [to],
+        "subject": subject,
+        "text": text,
+    }
+    if html:
+        payload["html"] = html
+    body = json.dumps(payload).encode("utf-8")
+    req = urllib.request.Request(
+        "https://api.resend.com/emails",
+        data=body,
+        method="POST",
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            if resp.status >= 300:
+                raise RuntimeError(f"Resend HTTP {resp.status}")
+    except urllib.error.HTTPError as exc:
+        detail = exc.read().decode("utf-8", errors="replace")[:400]
+        raise RuntimeError(f"Resend HTTP {exc.code}: {detail}") from exc
+
+
+def _send_via_smtp(*, to: str, subject: str, text: str, html: str | None = None) -> None:
+    host = os.environ.get("SMTP_HOST", "").strip()
+    if not host:
+        raise RuntimeError("SMTP_HOST missing")
+    port = int(os.environ.get("SMTP_PORT", "587") or "587")
+    user = os.environ.get("SMTP_USER", "").strip()
+    password = os.environ.get("SMTP_PASS", "").strip()
+    use_tls = os.environ.get("SMTP_TLS", "1").strip().lower() not in {"0", "false", "no"}
+    msg = EmailMessage()
+    msg["From"] = ALERT_FROM_EMAIL
+    msg["To"] = to
+    msg["Subject"] = subject
+    msg.set_content(text)
+    if html:
+        msg.add_alternative(html, subtype="html")
+    with smtplib.SMTP(host, port, timeout=30) as smtp:
+        if use_tls:
+            smtp.starttls()
+        if user:
+            smtp.login(user, password)
+        smtp.send_message(msg)
+
+
+def _send_email(*, to: str, subject: str, text: str, html: str | None = None) -> str:
+    """Send email; returns provider id. Raises RuntimeError if not configured / send fails."""
+    provider = _email_provider()
+    if provider == "resend":
+        _send_via_resend(to=to, subject=subject, text=text, html=html)
+        return "resend"
+    if provider == "smtp":
+        _send_via_smtp(to=to, subject=subject, text=text, html=html)
+        return "smtp"
+    raise RuntimeError(
+        "E-mail není nakonfigurován. Nastavte RESEND_API_KEY (+ ALERT_FROM_EMAIL) "
+        "nebo SMTP_HOST / SMTP_PORT / SMTP_USER / SMTP_PASS / SMTP_TLS."
+    )
+
+
+def _format_alert_email(leads: list[dict[str, Any]], *, test: bool = False) -> tuple[str, str, str]:
+    if test:
+        subject = "DeskaRadar — zkušební e-mail"
+        text = (
+            "Toto je zkušební e-mail z DeskaRadaru.\n\n"
+            f"Otevřít aplikaci: {PUBLIC_APP_URL}/app\n"
+            "Pokud jste e-mail dostali, doručení funguje."
+        )
+        html = (
+            "<p>Toto je <strong>zkušební e-mail</strong> z DeskaRadaru.</p>"
+            f'<p><a href="{PUBLIC_APP_URL}/app">Otevřít aplikaci</a></p>'
+            "<p>Pokud jste e-mail dostali, doručení funguje.</p>"
+        )
+        return subject, text, html
+    n = len(leads)
+    subject = f"DeskaRadar — {n} nový{'ch' if n != 1 else ''} lead{'ů' if n != 1 else ''}"
+    lines = [f"DeskaRadar: {n} nových leadů (posledních 24 h, dle vašich preferencí)", ""]
+    html_items = []
+    for L in leads:
+        title = L.get("title_redacted") or L.get("title") or "(bez názvu)"
+        muni = L.get("municipality") or "?"
+        pub = L.get("published_at") or L.get("posted") or "?"
+        conf = L.get("confidence") or ""
+        url = L.get("url") or ""
+        lines.append(f"- [{conf}] {muni} · {pub}: {title}")
+        if url:
+            lines.append(f"  {url}")
+        link = f' <a href="{url}">zdroj</a>' if url else ""
+        html_items.append(
+            f"<li><strong>{title}</strong> — {muni} · {pub} · {conf}{link}</li>"
+        )
+    lines.append("")
+    lines.append(f"Aplikace: {PUBLIC_APP_URL}/app")
+    text = "\n".join(lines)
+    html = (
+        f"<p>DeskaRadar: <strong>{n}</strong> nových leadů (24 h).</p>"
+        f"<ul>{''.join(html_items)}</ul>"
+        f'<p><a href="{PUBLIC_APP_URL}/app">Otevřít DeskaRadar</a></p>'
+    )
+    return subject, text, html
+
+
+def _dispatch_alerts_for_prefs(
+    user_key: str,
+    prefs: dict[str, Any],
+    leads: list[dict[str, Any]],
+    *,
+    force_test: bool = False,
+) -> dict[str, Any]:
+    """Send matching new leads (or a test message). Dedupes via alert_sent."""
+    to = (prefs.get("email") or "").strip()
+    if not to or "@" not in to:
+        return {"ok": False, "error": "prefs.email chybí nebo je neplatný", "sent": 0}
+    if not force_test and not prefs.get("enabled", True):
+        return {"ok": True, "skipped": "disabled", "sent": 0}
+    if not _email_configured():
+        return {
+            "ok": False,
+            "error": (
+                "E-mail není nakonfigurován. Nastavte RESEND_API_KEY "
+                "(nebo SMTP_HOST…) v prostředí služby."
+            ),
+            "sent": 0,
+            "status_code": 503,
+        }
+    if force_test:
+        subject, text, html = _format_alert_email([], test=True)
+        provider = _send_email(to=to, subject=subject, text=text, html=html)
+        return {"ok": True, "sent": 1, "provider": provider, "test": True, "to": to}
+
+    matching = _alerts_for_prefs(leads, prefs)
+    fresh: list[dict[str, Any]] = []
+    for L in matching:
+        key = _lead_dedupe_key(L)
+        if _alert_was_sent(user_key, key):
+            continue
+        fresh.append(L)
+    if not fresh:
+        return {"ok": True, "sent": 0, "skipped": "nothing_new", "matched": len(matching)}
+    subject, text, html = _format_alert_email(fresh, test=False)
+    provider = _send_email(to=to, subject=subject, text=text, html=html)
+    for L in fresh:
+        _mark_alert_sent(user_key, _lead_dedupe_key(L))
+    return {
+        "ok": True,
+        "sent": len(fresh),
+        "matched": len(matching),
+        "provider": provider,
+        "to": to,
+    }
+
+
+def _maybe_send_alerts_after_live(snap: dict[str, Any]) -> None:
+    """After successful live refresh, email prefs-matching new leads (best-effort)."""
+    if snap.get("data_mode") != "live":
+        return
+    if not _email_configured():
+        return
+    leads = snap.get("leads") or []
+    for user_key, prefs in _all_alert_prefs():
+        try:
+            if not prefs.get("enabled"):
+                continue
+            if not (prefs.get("email") or "").strip():
+                continue
+            _dispatch_alerts_for_prefs(user_key, prefs, leads, force_test=False)
+        except Exception:
+            # Never break refresh path on mail failure
+            pass
+
 
 
 # --- session helpers ---
@@ -315,9 +584,12 @@ def _refresh_feeds(*, force: bool = False) -> dict[str, Any]:
         with _lock:
             _refreshing = False
 
-    return _snapshot()
-
-
+    snap = _snapshot()
+    try:
+        _maybe_send_alerts_after_live(snap)
+    except Exception:
+        pass
+    return snap
 
 
 _BADGE_LEAKS = ("fixture", "sample", "ofn", "tls", "json-ld", "scrape")
@@ -346,6 +618,7 @@ def _public_feed_status(s: dict[str, Any]) -> dict[str, Any]:
         out["provider"] = "ukazka"
     return out
 
+
 def _meta_fields(snap: dict[str, Any]) -> dict[str, Any]:
     """data_mode + attribution; sample_label only when fixture/ukázka."""
     out: dict[str, Any] = {
@@ -356,6 +629,7 @@ def _meta_fields(snap: dict[str, Any]) -> dict[str, Any]:
     if sl:
         out["sample_label"] = sl
     return out
+
 
 def _snapshot() -> dict[str, Any]:
     with _lock:
@@ -382,7 +656,6 @@ def _snapshot() -> dict[str, Any]:
         if sl:
             out["sample_label"] = sl
         return out
-
 
 
 def _ensure_data(*, force: bool = False) -> dict[str, Any]:
@@ -879,6 +1152,64 @@ def put_alert_prefs(
     return {"ok": True, "prefs": saved}
 
 
+@app.get("/api/alerts/status")
+def api_alerts_status(dr_session: str | None = Cookie(default=None, alias=SESSION_COOKIE)):
+    """Whether outbound alert email is configured (no secrets exposed)."""
+    if not _require_user(dr_session):
+        return _auth_error()
+    provider = _email_provider()
+    return {
+        "ok": True,
+        "email_configured": provider is not None,
+        "provider": provider,
+        "from_email": ALERT_FROM_EMAIL if provider else None,
+    }
+
+
+@app.post("/api/alerts/send-test")
+def api_alerts_send_test(dr_session: str | None = Cookie(default=None, alias=SESSION_COOKIE)):
+    """Send one test email to the logged-in user's prefs.email (auth required)."""
+    if not _require_user(dr_session):
+        return _auth_error()
+    user = _require_user(dr_session)
+    assert user
+    prefs = _load_prefs(user["email"])
+    if not (prefs.get("email") or "").strip():
+        return JSONResponse(
+            {
+                "ok": False,
+                "error": "Nejdřív uložte e-mail v nastavení alertů.",
+            },
+            status_code=400,
+        )
+    if not _email_configured():
+        return JSONResponse(
+            {
+                "ok": False,
+                "error": (
+                    "E-mail není nakonfigurován. Na Renderu nastavte RESEND_API_KEY "
+                    "a ALERT_FROM_EMAIL (nebo SMTP_*). Viz ALERT-EMAIL.md / DEPLOY.md."
+                ),
+                "email_configured": False,
+                "provider": None,
+            },
+            status_code=503,
+        )
+    try:
+        result = _dispatch_alerts_for_prefs(
+            user["email"], prefs, [], force_test=True
+        )
+    except Exception as exc:  # noqa: BLE001
+        return JSONResponse(
+            {"ok": False, "error": f"Odeslání selhalo: {exc}"},
+            status_code=502,
+        )
+    if not result.get("ok"):
+        code = int(result.pop("status_code", 400) or 400)
+        return JSONResponse(result, status_code=code)
+    return result
+
+
 @app.get("/api/providers")
 def api_providers(dr_session: str | None = Cookie(default=None, alias=SESSION_COOKIE)):
     """List ingest providers (CZ live; AT/DE/IT stubs for future packs)."""
@@ -942,6 +1273,5 @@ def _startup():
 if __name__ == "__main__":
     import uvicorn
 
-    import os
     port = int(os.environ.get("PORT", "8765"))
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)
